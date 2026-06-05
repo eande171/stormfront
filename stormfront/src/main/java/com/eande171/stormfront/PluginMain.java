@@ -1,10 +1,10 @@
-package com.eande171.plugin;
+package com.eande171.stormfront;
 
-import com.eande171.plugin.constants.Permissions;
-import com.eande171.plugin.services.ConfigService;
-import com.eande171.plugin.services.MessageService;
-import com.eande171.plugin.services.PlayerDataService;
-import com.eande171.plugin.services.PluginService;
+import com.eande171.stormfront.constants.Permissions;
+import com.eande171.stormfront.services.ConfigService;
+import com.eande171.stormfront.services.MessageService;
+import com.eande171.stormfront.services.PlayerDataService;
+import com.eande171.stormfront.services.PluginService;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
@@ -19,7 +19,6 @@ public final class PluginMain extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         configService = new ConfigService(this);
         configService.load();
 
@@ -39,7 +38,6 @@ public final class PluginMain extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
         getLogger().info("Plugin Disabled! Version: " + getPluginMeta().getVersion());
     }
 
@@ -52,7 +50,7 @@ public final class PluginMain extends JavaPlugin {
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             event.registrar().register(
-                Commands.literal("template")
+                Commands.literal("stormfront")
                     .requires(ctx -> ctx.getSender().hasPermission(Permissions.ADMIN))
                     .then(Commands.literal("on").executes(cmd::onOn))
                     .then(Commands.literal("off").executes(cmd::onOff))

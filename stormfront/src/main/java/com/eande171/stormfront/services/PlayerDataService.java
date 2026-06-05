@@ -1,6 +1,4 @@
-package com.eande171.plugin.services;
-
-import org.bukkit.entity.Player;
+package com.eande171.stormfront.services;
 
 import java.util.HashMap;
 import java.util.Map;

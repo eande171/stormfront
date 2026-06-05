@@ -1,6 +1,6 @@
-package com.eande171.plugin.services;
+package com.eande171.stormfront.services;
 
-import com.eande171.plugin.PluginMain;
+import com.eande171.stormfront.PluginMain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +22,6 @@ public class ConfigService {
 
     public void save() {
         plugin.getConfig().set("active", active);
-
         plugin.saveConfig();
     }
 

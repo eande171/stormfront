@@ -1,11 +1,10 @@
-package com.eande171.plugin;
+package com.eande171.stormfront;
 
-import com.eande171.plugin.services.ConfigService;
-import com.eande171.plugin.services.MessageService;
-import com.eande171.plugin.services.PluginService;
+import com.eande171.stormfront.services.ConfigService;
+import com.eande171.stormfront.services.MessageService;
+import com.eande171.stormfront.services.PluginService;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
 
@@ -39,21 +38,4 @@ public class PluginCommand {
         }
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
-
-    // Arguments
-    /*public int onSetGrace(CommandContext<CommandSourceStack> ctx) {
-        long seconds = com.mojang.brigadier.arguments.LongArgumentType.getLong(ctx, "seconds");
-
-        configService.setGracePeriod(seconds * 1000L);
-        ctx.getSource().getSender().sendMessage(messageService.graceSet(seconds));
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-    }
-
-    public int onSetDamage(CommandContext<CommandSourceStack> ctx) {
-        double value = com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(ctx, "value");
-
-        configService.setDamage(value);
-        ctx.getSource().getSender().sendMessage(messageService.damageSet(value));
-        return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-    }*/
 }

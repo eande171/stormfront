@@ -1,6 +1,6 @@
-package com.eande171.plugin.services;
+package com.eande171.stormfront.services;
 
-import com.eande171.plugin.PluginMain;
+import com.eande171.stormfront.PluginMain;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -17,19 +17,13 @@ public class PluginService {
 
     public void enable() {
         configService.setActive(true);
-
-        // Start Logic
     }
 
     public void disable() {
         configService.setActive(false);
-
-        // Stop Logic
     }
 
     private void tick() {
         if (!configService.isActive()) { return; }
-
-        // Tick Logic
     }
 }

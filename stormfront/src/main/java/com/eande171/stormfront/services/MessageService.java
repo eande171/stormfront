@@ -1,6 +1,6 @@
-package com.eande171.plugin.services;
+package com.eande171.stormfront.services;
 
-import com.eande171.plugin.PluginMain;
+import com.eande171.stormfront.PluginMain;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -28,7 +28,6 @@ public class MessageService {
 
         messages = YamlConfiguration.loadConfiguration(file);
 
-        // Merge any missing keys from the default bundled file
         InputStream defaults = plugin.getResource("messages.yml");
         if (defaults != null) {
             YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(
@@ -49,7 +48,6 @@ public class MessageService {
         return value;
     }
 
-    // Helpers
     private Component parse(String path) {
         return miniMessage.deserialize(getRaw(path));
     }
@@ -59,10 +57,8 @@ public class MessageService {
             Placeholder.unparsed(key, String.valueOf(value)));
     }
 
-    // Action bar messages
     public Component exampleMessage(long value) { return parse("action-bar.example", "value", value); }
 
-    // Command messages
     public Component exampleCommand() { return parse("commands.example"); }
     public Component alreadyOn()  { return parse("commands.already-on"); }
     public Component nowOn()      { return parse("commands.now-on"); }
