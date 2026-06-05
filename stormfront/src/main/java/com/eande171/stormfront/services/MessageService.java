@@ -57,12 +57,6 @@ public class MessageService {
             Placeholder.unparsed(key, String.valueOf(value)));
     }
 
-    public Component exampleMessage(long value) { return parse("action-bar.example", "value", value); }
-
-    public Component exampleCommand() { return parse("commands.example"); }
-    public Component alreadyOn()  { return parse("commands.already-on"); }
-    public Component nowOn()      { return parse("commands.now-on"); }
-    public Component alreadyOff() { return parse("commands.already-off"); }
-    public Component nowOff()     { return parse("commands.now-off"); }
+    public Component placeholder() { return parse("commands.placeholder"); }
 
 }

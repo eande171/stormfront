@@ -1,11 +1,3 @@
 # https://docs.advntr.dev/minimessage/format.html
 commands:
-  example: "<green>Example message."
-
-  already-on: "<yellow>Stormfront is already on."
-  now-on: "<green>Stormfront is now ON."
-  already-off: "<yellow>Stormfront is already off."
-  now-off: "<red>Stormfront is now OFF."
-
-action-bar:
-  example: "<yellow>Example action bar message with <value>."
+  placeholder: "<gray>Stormfront placeholder message."

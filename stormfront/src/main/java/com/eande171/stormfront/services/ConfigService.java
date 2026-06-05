@@ -9,21 +9,14 @@ public class ConfigService {
 
     private final PluginMain plugin;
 
-    @Getter private boolean active;
+    @Getter private int maxParticlesPerPlayer;
 
     public void load() {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
 
-        active = plugin.getConfig().getBoolean("active");
+        maxParticlesPerPlayer = plugin.getConfig().getInt("max-particles-per-player");
 
-        plugin.getLogger().info("Loaded active: " + active);
+        plugin.getLogger().info("Config loaded.");
     }
-
-    public void save() {
-        plugin.getConfig().set("active", active);
-        plugin.saveConfig();
-    }
-
-    public void setActive(boolean active) { this.active = active; save(); }
 }

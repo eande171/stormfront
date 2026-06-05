@@ -1,1 +1,3 @@
-active: false
+# Maximum number of particles sent to each player per tick.
+# Lower this if you experience TPS drops on large servers.
+max-particles-per-player: 50
