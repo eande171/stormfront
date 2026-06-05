@@ -1,0 +1,14 @@
+name: template
+version: '${version}'
+
+main: com.eande171.plugin.PluginMain
+api-version: '1.21.11'
+load: POSTWORLD
+
+description: Template description
+authors: [ Eden Anderson ]
+
+permissions:
+  template.admin:
+    description: Allows use of all template commands
+    default: op
