@@ -19,6 +19,7 @@ public final class PluginMain extends JavaPlugin {
     @Getter private MessageService messageService;
     @Getter private PlayerDataService playerDataService;
     @Getter private CellManager cellManager;
+    @Getter private WeatherPacketService weatherPacketService;
     @Getter private WeatherScheduler weatherScheduler;
 
     @Override
@@ -33,7 +34,8 @@ public final class PluginMain extends JavaPlugin {
 
         playerDataService = new PlayerDataService();
         cellManager = new CellManager(this);
-        weatherScheduler = new WeatherScheduler(this, cellManager, playerDataService);
+        weatherPacketService = new WeatherPacketService();
+        weatherScheduler = new WeatherScheduler(this, cellManager, playerDataService, weatherPacketService);
         weatherScheduler.start(configService.getSchedulerIntervalTicks());
 
         registerWeatherTypes();
@@ -61,13 +63,15 @@ public final class PluginMain extends JavaPlugin {
                 Commands.literal("stormfront")
                     .requires(ctx -> ctx.getSender().hasPermission(Permissions.ADMIN))
                     .then(Commands.literal("test").executes(cmd::onTest))
+                    .then(Commands.literal("stop").executes(cmd::onStop))
                     .build()
             );
         });
     }
 
     private void registerListeners() {
-        getServer().getPluginManager().registerEvents(new PluginListener(playerDataService), this);
+        getServer().getPluginManager().registerEvents(
+            new PluginListener(playerDataService, weatherPacketService, cellManager), this);
     }
 
     private void suppressVanillaWeather() {

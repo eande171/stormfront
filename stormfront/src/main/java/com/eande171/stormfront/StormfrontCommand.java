@@ -18,6 +18,15 @@ public class StormfrontCommand {
 
     private final CellManager cellManager;
 
+    public int onStop(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        int count = cellManager.getActiveCells().size();
+        new java.util.ArrayList<>(cellManager.getActiveCells())
+            .forEach(cell -> cellManager.removeCell(cell.getId()));
+        sender.sendMessage("Removed " + count + " active cell(s).");
+        return count;
+    }
+
     public int onTest(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
 
