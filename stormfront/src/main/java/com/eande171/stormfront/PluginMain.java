@@ -10,7 +10,10 @@ import com.eande171.stormfront.weather.BlizzardType;
 import com.eande171.stormfront.weather.DenseFogType;
 import com.eande171.stormfront.weather.RainfrontType;
 import com.eande171.stormfront.weather.ThunderstormType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
 import org.bukkit.World;
@@ -68,12 +71,22 @@ public final class PluginMain extends JavaPlugin {
             event.registrar().register(
                 Commands.literal("stormfront")
                     .requires(ctx -> ctx.getSender().hasPermission(Permissions.ADMIN))
-                    .then(Commands.literal("test")
-                        .then(Commands.literal("rain").executes(cmd::onTestRain))
-                        .then(Commands.literal("thunder").executes(cmd::onTestThunder))
-                        .then(Commands.literal("fog").executes(cmd::onTestFog))
-                        .then(Commands.literal("blizzard").executes(cmd::onTestBlizzard)))
+                    .then(Commands.literal("spawn")
+                        .then(Commands.argument("type", ArgumentTypes.namespacedKey())
+                            .suggests((ctx, builder) -> {
+                                StormfrontAPI.get().getRegistry().getAll()
+                                    .forEach(t -> builder.suggest(t.getId()));
+                                return builder.buildFuture();
+                            })
+                            .executes(cmd::onSpawn)
+                            .then(Commands.argument("radius", IntegerArgumentType.integer(1, 1000))
+                                .executes(cmd::onSpawn)
+                                .then(Commands.argument("intensity", FloatArgumentType.floatArg(0.1f, 1.0f))
+                                    .executes(cmd::onSpawn)
+                                    .then(Commands.argument("duration", IntegerArgumentType.integer(-1))
+                                        .executes(cmd::onSpawn))))))
                     .then(Commands.literal("stop").executes(cmd::onStop))
+                    .then(Commands.literal("list").executes(cmd::onList))
                     .build()
             );
         });
