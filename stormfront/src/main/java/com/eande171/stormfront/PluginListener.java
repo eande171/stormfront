@@ -1,6 +1,8 @@
 package com.eande171.stormfront;
 
 import com.eande171.stormfront.api.WeatherCell;
+import com.eande171.stormfront.api.events.PlayerEnterWeatherCellEvent;
+import com.eande171.stormfront.api.events.PlayerExitWeatherCellEvent;
 import com.eande171.stormfront.services.PlayerDataService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
@@ -15,6 +17,16 @@ public class PluginListener implements Listener {
     private final PlayerDataService playerDataService;
     private final WeatherPacketService weatherPacketService;
     private final CellManager cellManager;
+
+    @EventHandler
+    public void onPlayerEnterCell(PlayerEnterWeatherCellEvent event) {
+        event.getCell().getType().onPlayerEnter(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerExitCell(PlayerExitWeatherCellEvent event) {
+        event.getCell().getType().onPlayerExit(event.getPlayer());
+    }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {

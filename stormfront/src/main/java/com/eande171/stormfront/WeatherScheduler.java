@@ -33,96 +33,102 @@ public class WeatherScheduler {
             cellMap.put(cell.getId(), cell);
         }
 
-        // Determine which cells are expiring this tick
+        // Determine which cells are expiring this tick.
+        // startedAt is an epoch-ms timestamp; duration is in ticks (1 tick = 50 ms).
         Set<UUID> expiring = new HashSet<>();
+        long nowMs = System.currentTimeMillis();
         for (WeatherCell cell : cellMap.values()) {
             if (!cell.isIndefinite()) {
-                long currentTick = cell.getCenter().getWorld().getFullTime();
-                if (currentTick - cell.getStartedAt() >= cell.getDuration()) {
+                if (nowMs - cell.getStartedAt() >= cell.getDuration() * 50L) {
                     expiring.add(cell.getId());
                 }
             }
         }
 
-        // Process each online player
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            UUID playerUUID = player.getUniqueId();
-            Set<UUID> previous = playerDataService.getCellIds(playerUUID);
-            Set<UUID> current = new HashSet<>();
+        try {
+            // Process each online player
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                UUID playerUUID = player.getUniqueId();
+                Set<UUID> previous = playerDataService.getCellIds(playerUUID);
+                Set<UUID> current = new HashSet<>();
 
+                for (WeatherCell cell : cellMap.values()) {
+                    if (expiring.contains(cell.getId())) continue;
+                    if (!player.getWorld().equals(cell.getCenter().getWorld())) continue;
+                    if (player.getLocation().distance(cell.getCenter()) <= cell.getRadius()) {
+                        current.add(cell.getId());
+                    }
+                }
+
+                // Fire enter events for newly entered cells
+                for (UUID id : current) {
+                    if (!previous.contains(id)) {
+                        Bukkit.getPluginManager().callEvent(
+                            new PlayerEnterWeatherCellEvent(player, cellMap.get(id)));
+                    }
+                }
+
+                // Fire exit events — includes cells the player left and cells that are expiring
+                for (UUID id : previous) {
+                    if (!current.contains(id)) {
+                        WeatherCell cell = cellMap.get(id);
+                        if (cell != null) {
+                            Bukkit.getPluginManager().callEvent(
+                                new PlayerExitWeatherCellEvent(player, cell));
+                        }
+                    }
+                }
+
+                playerDataService.setCellIds(playerUUID, current);
+
+                Optional<WeatherCell> priorityCell = current.stream()
+                    .map(cellMap::get)
+                    .filter(Objects::nonNull)
+                    .max(Comparator.comparingInt(c -> c.getType().getPriority()));
+
+                priorityCell.ifPresent(cell -> cell.getType().onTick(cell, player));
+
+                // Rain level uses a sqrt curve — sky greys quickly near the edge
+                // Thunder level depth is driven by the type's thunder multiplier
+                float targetRain = priorityCell.map(cell -> {
+                    double distance = player.getLocation().distance(cell.getCenter());
+                    float distanceFactor = Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
+                    return cell.getIntensity() * (float) Math.sqrt(distanceFactor) * cell.getType().getRainMultiplier();
+                }).orElse(0f);
+
+                float targetThunder = priorityCell
+                    .map(cell -> targetRain * cell.getType().getThunderMultiplier())
+                    .orElse(0f);
+
+                weatherPacketService.tick(player, targetRain, targetThunder);
+            }
+
+            // Process nearby entities for each active, non-expiring cell
             for (WeatherCell cell : cellMap.values()) {
                 if (expiring.contains(cell.getId())) continue;
-                if (!player.getWorld().equals(cell.getCenter().getWorld())) continue;
-                if (player.getLocation().distance(cell.getCenter()) <= cell.getRadius()) {
-                    current.add(cell.getId());
-                }
-            }
+                Location center = cell.getCenter();
+                if (center.getWorld() == null) continue;
 
-            // Fire enter events for newly entered cells
-            for (UUID id : current) {
-                if (!previous.contains(id)) {
-                    Bukkit.getPluginManager().callEvent(
-                        new PlayerEnterWeatherCellEvent(player, cellMap.get(id)));
-                }
-            }
-
-            // Fire exit events — includes cells the player left and cells that are expiring
-            for (UUID id : previous) {
-                if (!current.contains(id)) {
-                    WeatherCell cell = cellMap.get(id);
-                    if (cell != null) {
-                        Bukkit.getPluginManager().callEvent(
-                            new PlayerExitWeatherCellEvent(player, cell));
+                double r = cell.getRadius();
+                for (Entity entity : center.getWorld().getNearbyEntities(center, r, r, r,
+                        e -> e instanceof LivingEntity && !(e instanceof Player))) {
+                    if (entity.getLocation().distance(center) <= r) {
+                        cell.getType().onEntityTick(cell, (LivingEntity) entity);
                     }
                 }
             }
 
-            playerDataService.setCellIds(playerUUID, current);
-
-            Optional<WeatherCell> priorityCell = current.stream()
-                .map(cellMap::get)
-                .filter(Objects::nonNull)
-                .max(Comparator.comparingInt(c -> c.getType().getPriority()));
-
-            priorityCell.ifPresent(cell -> cell.getType().onTick(cell, player));
-
-            // Rain level uses a sqrt curve — sky greys quickly near the edge
-            // Thunder level adds subtle cloud depth at 25% of rain level
-            float targetRain = priorityCell.map(cell -> {
-                double distance = player.getLocation().distance(cell.getCenter());
-                float distanceFactor = Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
-                return cell.getIntensity() * (float) Math.sqrt(distanceFactor);
-            }).orElse(0f);
-
-            float targetThunder = targetRain * 0.25f;
-
-            weatherPacketService.tick(player, targetRain, targetThunder);
-        }
-
-        // Process nearby entities for each active, non-expiring cell
-        for (WeatherCell cell : cellMap.values()) {
-            if (expiring.contains(cell.getId())) continue;
-            Location center = cell.getCenter();
-            if (center.getWorld() == null) continue;
-
-            double r = cell.getRadius();
-            for (Entity entity : center.getWorld().getNearbyEntities(center, r, r, r,
-                    e -> e instanceof LivingEntity && !(e instanceof Player))) {
-                if (entity.getLocation().distance(center) <= r) {
-                    cell.getType().onEntityTick(cell, (LivingEntity) entity);
-                }
+            // Move non-expiring cells by their movement vector
+            for (WeatherCell cell : cellMap.values()) {
+                if (expiring.contains(cell.getId())) continue;
+                Location previousCenter = cell.getCenter().clone();
+                cell.setCenter(cell.getCenter().clone().add(cell.getMovementVector()));
+                Bukkit.getPluginManager().callEvent(new WeatherCellMoveEvent(cell, previousCenter));
             }
+        } finally {
+            // Expire cells — guaranteed to run even if processing throws
+            // CellManager handles onEnd and WeatherCellEndEvent
+            expiring.forEach(cellManager::removeCell);
         }
-
-        // Move non-expiring cells by their movement vector
-        for (WeatherCell cell : cellMap.values()) {
-            if (expiring.contains(cell.getId())) continue;
-            Location previousCenter = cell.getCenter().clone();
-            cell.setCenter(cell.getCenter().clone().add(cell.getMovementVector()));
-            Bukkit.getPluginManager().callEvent(new WeatherCellMoveEvent(cell, previousCenter));
-        }
-
-        // Expire cells — CellManager handles onEnd and WeatherCellEndEvent
-        expiring.forEach(cellManager::removeCell);
     }
 }

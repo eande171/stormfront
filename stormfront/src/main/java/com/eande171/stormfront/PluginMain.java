@@ -6,7 +6,9 @@ import com.eande171.stormfront.registry.StormfrontImpl;
 import com.eande171.stormfront.services.ConfigService;
 import com.eande171.stormfront.services.MessageService;
 import com.eande171.stormfront.services.PlayerDataService;
+import com.eande171.stormfront.weather.DenseFogType;
 import com.eande171.stormfront.weather.RainfrontType;
+import com.eande171.stormfront.weather.ThunderstormType;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
@@ -53,6 +55,8 @@ public final class PluginMain extends JavaPlugin {
 
     private void registerWeatherTypes() {
         StormfrontAPI.get().getRegistry().register(new RainfrontType());
+        StormfrontAPI.get().getRegistry().register(new ThunderstormType());
+        StormfrontAPI.get().getRegistry().register(new DenseFogType());
     }
 
     private void registerCommands() {
@@ -62,7 +66,10 @@ public final class PluginMain extends JavaPlugin {
             event.registrar().register(
                 Commands.literal("stormfront")
                     .requires(ctx -> ctx.getSender().hasPermission(Permissions.ADMIN))
-                    .then(Commands.literal("test").executes(cmd::onTest))
+                    .then(Commands.literal("test")
+                        .then(Commands.literal("rain").executes(cmd::onTestRain))
+                        .then(Commands.literal("thunder").executes(cmd::onTestThunder))
+                        .then(Commands.literal("fog").executes(cmd::onTestFog)))
                     .then(Commands.literal("stop").executes(cmd::onStop))
                     .build()
             );

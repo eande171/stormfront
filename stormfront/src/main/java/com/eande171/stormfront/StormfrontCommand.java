@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,16 +19,28 @@ public class StormfrontCommand {
 
     private final CellManager cellManager;
 
+    public int onTestRain(CommandContext<CommandSourceStack> ctx) {
+        return spawnTestCell(ctx, "stormfront:rain");
+    }
+
+    public int onTestThunder(CommandContext<CommandSourceStack> ctx) {
+        return spawnTestCell(ctx, "stormfront:thunderstorm");
+    }
+
+    public int onTestFog(CommandContext<CommandSourceStack> ctx) {
+        return spawnTestCell(ctx, "stormfront:fog");
+    }
+
     public int onStop(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
         int count = cellManager.getActiveCells().size();
-        new java.util.ArrayList<>(cellManager.getActiveCells())
+        new ArrayList<>(cellManager.getActiveCells())
             .forEach(cell -> cellManager.removeCell(cell.getId()));
         sender.sendMessage("Removed " + count + " active cell(s).");
         return count;
     }
 
-    public int onTest(CommandContext<CommandSourceStack> ctx) {
+    private int spawnTestCell(CommandContext<CommandSourceStack> ctx, String typeId) {
         CommandSender sender = ctx.getSource().getSender();
 
         if (!(sender instanceof Player player)) {
@@ -35,10 +48,10 @@ public class StormfrontCommand {
             return 0;
         }
 
-        Optional<WeatherType> type = StormfrontAPI.get().getRegistry().get("stormfront:rain");
+        Optional<WeatherType> type = StormfrontAPI.get().getRegistry().get(typeId);
 
         if (type.isEmpty()) {
-            sender.sendMessage("RainfrontType is not registered.");
+            sender.sendMessage("Weather type '" + typeId + "' is not registered.");
             return 0;
         }
 
@@ -49,13 +62,13 @@ public class StormfrontCommand {
             .radius(50)
             .intensity(1.0f)
             .movementVector(new Vector(0, 0, 0))
-            .startedAt(player.getWorld().getFullTime())
+            .startedAt(System.currentTimeMillis())
             .duration(1200L)
             .build();
 
         cellManager.addCell(cell);
 
-        sender.sendMessage("Spawned a Rainfront cell at your location (radius 50, 60 seconds).");
+        sender.sendMessage("Spawned '" + typeId + "' at your location (radius 50, 60 seconds).");
         return 1;
     }
 }
