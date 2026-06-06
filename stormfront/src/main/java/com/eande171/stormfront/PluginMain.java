@@ -39,7 +39,7 @@ public final class PluginMain extends JavaPlugin {
         messageService.load();
 
         playerDataService = new PlayerDataService();
-        cellManager = new CellManager(this);
+        cellManager = new CellManager(this, playerDataService);
         weatherPacketService = new WeatherPacketService();
         weatherScheduler = new WeatherScheduler(this, cellManager, playerDataService, weatherPacketService);
         weatherScheduler.start(configService.getSchedulerIntervalTicks());

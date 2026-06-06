@@ -1,5 +1,6 @@
 package com.eande171.stormfront.weather;
 
+import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.LivingEntity;
@@ -32,7 +33,8 @@ public class RainfrontType extends AbstractRainType {
         float particleIntensity = cell.getIntensity() * distanceFactor * distanceFactor;
 
         spawnRainImpacts(player, particleIntensity);
-        applySlowness(player, particleIntensity);
+        applyMovementPenalty(player, particleIntensity);
+        WeatherUtils.extinguishNearbyFires(player, particleIntensity);
     }
 
     @Override

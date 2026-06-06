@@ -1,5 +1,6 @@
 package com.eande171.stormfront;
 
+import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.events.PlayerEnterWeatherCellEvent;
 import com.eande171.stormfront.api.events.PlayerExitWeatherCellEvent;
@@ -37,6 +38,8 @@ public class PluginListener implements Listener {
     @EventHandler
     public void onEntityCombust(EntityCombustEvent event) {
         Entity entity = event.getEntity();
+        // Covered entities aren't in sunlight - no need to intervene
+        if (!WeatherUtils.isExposed(entity.getLocation())) return;
         for (WeatherCell cell : cellManager.getActiveCells()) {
             if (!entity.getWorld().equals(cell.getCenter().getWorld())) continue;
             if (entity.getLocation().distance(cell.getCenter()) <= cell.getRadius()) {

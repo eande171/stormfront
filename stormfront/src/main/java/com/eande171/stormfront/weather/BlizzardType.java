@@ -1,5 +1,6 @@
 package com.eande171.stormfront.weather;
 
+import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Location;
@@ -7,9 +8,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import java.util.Random;
 import java.util.Set;
 
@@ -65,12 +63,14 @@ public class BlizzardType implements WeatherType {
         spawnSnowflakes(player, intensity);
         spawnGroundDrift(player, intensity);
         applyFreezeEffect(player, intensity);
-        applySlowness(player, intensity);
+        applyMovementPenalty(player, intensity);
+        WeatherUtils.extinguishNearbyFires(player, intensity);
     }
 
     @Override
     public void onPlayerExit(Player player) {
         player.setFreezeTicks(0);
+        player.setWalkSpeed(0.2f);
     }
 
     @Override
@@ -118,15 +118,23 @@ public class BlizzardType implements WeatherType {
 
     private void applyFreezeEffect(Player player, float intensity) {
         if (intensity <= 0) return;
+        if (!WeatherUtils.isExposed(player.getLocation())) return;
         int target = (int) (player.getMaxFreezeTicks() * intensity);
         player.setFreezeTicks(target);
     }
 
-    private void applySlowness(Player player, float intensity) {
-        if (intensity < 0.1f) return;
-        // Slowness II at high intensity - deep snow is exhausting
-        int amplifier = intensity > 0.6f ? 1 : 0;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, amplifier, true, false));
+    private void applyMovementPenalty(Player player, float intensity) {
+        if (!WeatherUtils.isExposed(player.getLocation())) {
+            player.setWalkSpeed(0.2f);
+            return;
+        }
+        if (intensity < 0.1f) {
+            player.setWalkSpeed(0.2f);
+            return;
+        }
+        // Blizzard is harsher than rain - significant drag from deep snow and wind
+        float speed = Math.max(0.15f, 0.2f - 0.05f * intensity);
+        player.setWalkSpeed(speed);
     }
 
     private float distanceFactor(WeatherCell cell, Location location) {

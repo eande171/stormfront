@@ -1,14 +1,12 @@
 package com.eande171.stormfront.weather;
 
+import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import java.util.Collections;
 import java.util.Random;
 import java.util.Set;
@@ -44,13 +42,28 @@ public class DenseFogType implements WeatherType {
         float distanceFactor = distanceFactor(cell, player.getLocation());
         float intensity = cell.getIntensity() * distanceFactor;
 
-        applySlowness(player, intensity);
+        applyMovementPenalty(player, intensity);
         spawnFogParticles(player, intensity);
     }
 
-    private void applySlowness(Player player, float intensity) {
-        if (intensity < 0.5f) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 0, true, false));
+    private void applyMovementPenalty(Player player, float intensity) {
+        if (!WeatherUtils.isExposed(player.getLocation())) {
+            player.setWalkSpeed(0.2f);
+            return;
+        }
+        // Fog only causes disorientation at higher intensities - light fog is fine
+        if (intensity < 0.5f) {
+            player.setWalkSpeed(0.2f);
+            return;
+        }
+        // Mild effect - fog slows you by caution, not by force
+        float speed = Math.max(0.175f, 0.2f - 0.025f * intensity);
+        player.setWalkSpeed(speed);
+    }
+
+    @Override
+    public void onPlayerExit(Player player) {
+        player.setWalkSpeed(0.2f);
     }
 
     private void spawnFogParticles(Player player, float intensity) {

@@ -1,13 +1,12 @@
 package com.eande171.stormfront.weather;
 
+import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Random;
 
@@ -15,6 +14,8 @@ public abstract class AbstractRainType implements WeatherType {
 
     protected static final Random RANDOM = new Random();
     private static final int GROUND_SCAN_DEPTH = 5;
+    private static final float NORMAL_WALK_SPEED = 0.2f;
+    private static final float MIN_WALK_SPEED = 0.185f;
 
     protected void spawnRainImpacts(Player player, float intensity) {
         int count = (int) (15 * intensity);
@@ -42,9 +43,22 @@ public abstract class AbstractRainType implements WeatherType {
         }
     }
 
-    protected void applySlowness(Player player, float intensity) {
-        if (intensity < 0.1f) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 0, true, false));
+    protected void applyMovementPenalty(Player player, float intensity) {
+        if (!WeatherUtils.isExposed(player.getLocation())) {
+            player.setWalkSpeed(NORMAL_WALK_SPEED);
+            return;
+        }
+        if (intensity < 0.1f) {
+            player.setWalkSpeed(NORMAL_WALK_SPEED);
+            return;
+        }
+        float speed = Math.max(MIN_WALK_SPEED, NORMAL_WALK_SPEED - 0.015f * intensity);
+        player.setWalkSpeed(speed);
+    }
+
+    @Override
+    public void onPlayerExit(Player player) {
+        player.setWalkSpeed(NORMAL_WALK_SPEED);
     }
 
     protected float distanceFactor(WeatherCell cell, Location location) {
