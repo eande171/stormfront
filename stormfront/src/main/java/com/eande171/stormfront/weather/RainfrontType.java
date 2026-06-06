@@ -27,7 +27,7 @@ public class RainfrontType extends AbstractRainType {
 
     @Override
     public void onTick(WeatherCell cell, Player player) {
-        // Particle intensity uses a squared curve — splashes only become heavy near centre
+        // Particle intensity uses a squared curve - splashes only become heavy near centre
         float distanceFactor = distanceFactor(cell, player.getLocation());
         float particleIntensity = cell.getIntensity() * distanceFactor * distanceFactor;
 

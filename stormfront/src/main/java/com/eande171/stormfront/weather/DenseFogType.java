@@ -23,7 +23,7 @@ public class DenseFogType implements WeatherType {
     @Override
     public int getPriority() { return 1; }
 
-    // Fog has its own visual identity — no rain sky or thunder darkening
+    // Fog has its own visual identity - no rain sky or thunder darkening
     @Override
     public float getRainMultiplier() { return 0f; }
 
@@ -49,25 +49,58 @@ public class DenseFogType implements WeatherType {
     }
 
     private void applySlowness(Player player, float intensity) {
-        if (intensity < 0.3f) return;
+        if (intensity < 0.5f) return;
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 0, true, false));
     }
 
     private void spawnFogParticles(Player player, float intensity) {
-        int count = (int) (8 * intensity);
-        if (count <= 0) return;
+        if (intensity <= 0) return;
 
         Location eyes = player.getEyeLocation();
         World world = eyes.getWorld();
 
-        for (int i = 0; i < count; i++) {
-            double x = eyes.getX() + (RANDOM.nextDouble() - 0.5) * 14;
-            double y = eyes.getY() + (RANDOM.nextDouble() - 0.3) * 5;
-            double z = eyes.getZ() + (RANDOM.nextDouble() - 0.5) * 14;
-            // Very slow drift speed so particles linger as wisps rather than shooting off
+        // Close layer - fills the immediate field of view, most obstructive
+        int closeCount = (int) (12 * intensity);
+        for (int i = 0; i < closeCount; i++) {
+            double x = eyes.getX() + (RANDOM.nextDouble() - 0.5) * 5;
+            double y = eyes.getY() + (RANDOM.nextDouble() - 0.5) * 3;
+            double z = eyes.getZ() + (RANDOM.nextDouble() - 0.5) * 5;
+            player.spawnParticle(Particle.CLOUD,
+                new Location(world, x, y, z),
+                1, 0.15, 0.05, 0.15, 0.001);
+        }
+
+        // Mid layer - ambient haze in the surrounding area
+        int midCount = (int) (10 * intensity);
+        for (int i = 0; i < midCount; i++) {
+            double x = eyes.getX() + (RANDOM.nextDouble() - 0.5) * 12;
+            double y = eyes.getY() + (RANDOM.nextDouble() - 0.4) * 5;
+            double z = eyes.getZ() + (RANDOM.nextDouble() - 0.5) * 12;
             player.spawnParticle(Particle.CLOUD,
                 new Location(world, x, y, z),
                 1, 0.3, 0.1, 0.3, 0.003);
+        }
+
+        // Far layer - distant drifting wisps, gives the impression of smoke in the distance
+        int farCount = (int) (6 * intensity);
+        for (int i = 0; i < farCount; i++) {
+            double x = eyes.getX() + (RANDOM.nextDouble() - 0.5) * 22;
+            double y = eyes.getY() + (RANDOM.nextDouble() - 0.3) * 7;
+            double z = eyes.getZ() + (RANDOM.nextDouble() - 0.5) * 22;
+            player.spawnParticle(Particle.CLOUD,
+                new Location(world, x, y, z),
+                2, 0.5, 0.2, 0.5, 0.005);
+        }
+
+        // Beyond-far layer - campfire smoke at the edge of visibility, rising haze effect
+        int smokeCount = (int) (5 * intensity);
+        for (int i = 0; i < smokeCount; i++) {
+            double x = eyes.getX() + (RANDOM.nextDouble() - 0.5) * 34;
+            double y = eyes.getY() + (RANDOM.nextDouble() - 0.5) * 6;
+            double z = eyes.getZ() + (RANDOM.nextDouble() - 0.5) * 34;
+            player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
+                new Location(world, x, y, z),
+                1, 0.4, 0.3, 0.4, 0.003);
         }
     }
 

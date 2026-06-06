@@ -6,6 +6,7 @@ import com.eande171.stormfront.registry.StormfrontImpl;
 import com.eande171.stormfront.services.ConfigService;
 import com.eande171.stormfront.services.MessageService;
 import com.eande171.stormfront.services.PlayerDataService;
+import com.eande171.stormfront.weather.BlizzardType;
 import com.eande171.stormfront.weather.DenseFogType;
 import com.eande171.stormfront.weather.RainfrontType;
 import com.eande171.stormfront.weather.ThunderstormType;
@@ -57,6 +58,7 @@ public final class PluginMain extends JavaPlugin {
         StormfrontAPI.get().getRegistry().register(new RainfrontType());
         StormfrontAPI.get().getRegistry().register(new ThunderstormType());
         StormfrontAPI.get().getRegistry().register(new DenseFogType());
+        StormfrontAPI.get().getRegistry().register(new BlizzardType());
     }
 
     private void registerCommands() {
@@ -69,7 +71,8 @@ public final class PluginMain extends JavaPlugin {
                     .then(Commands.literal("test")
                         .then(Commands.literal("rain").executes(cmd::onTestRain))
                         .then(Commands.literal("thunder").executes(cmd::onTestThunder))
-                        .then(Commands.literal("fog").executes(cmd::onTestFog)))
+                        .then(Commands.literal("fog").executes(cmd::onTestFog))
+                        .then(Commands.literal("blizzard").executes(cmd::onTestBlizzard)))
                     .then(Commands.literal("stop").executes(cmd::onStop))
                     .build()
             );

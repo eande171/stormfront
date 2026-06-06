@@ -31,6 +31,10 @@ public class StormfrontCommand {
         return spawnTestCell(ctx, "stormfront:fog");
     }
 
+    public int onTestBlizzard(CommandContext<CommandSourceStack> ctx) {
+        return spawnTestCell(ctx, "stormfront:blizzard");
+    }
+
     public int onStop(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
         int count = cellManager.getActiveCells().size();

@@ -53,7 +53,7 @@ public class ThunderstormType extends AbstractRainType {
         if (intensity <= 0) return;
         if (RANDOM.nextFloat() >= intensity * LIGHTNING_CHANCE) return;
 
-        // Strike at a random location within ~20 blocks — Gaussian so most land close
+        // Strike at a random location within ~20 blocks - Gaussian so most land close
         double offsetX = RANDOM.nextGaussian() * 20;
         double offsetZ = RANDOM.nextGaussian() * 20;
         Location base = player.getLocation().add(offsetX, 0, offsetZ);

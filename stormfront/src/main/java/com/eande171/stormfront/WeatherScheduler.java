@@ -68,7 +68,7 @@ public class WeatherScheduler {
                     }
                 }
 
-                // Fire exit events — includes cells the player left and cells that are expiring
+                // Fire exit events - includes cells the player left and cells that are expiring
                 for (UUID id : previous) {
                     if (!current.contains(id)) {
                         WeatherCell cell = cellMap.get(id);
@@ -88,7 +88,7 @@ public class WeatherScheduler {
 
                 priorityCell.ifPresent(cell -> cell.getType().onTick(cell, player));
 
-                // Rain level uses a sqrt curve — sky greys quickly near the edge
+                // Rain level uses a sqrt curve - sky greys quickly near the edge
                 // Thunder level depth is driven by the type's thunder multiplier
                 float targetRain = priorityCell.map(cell -> {
                     double distance = player.getLocation().distance(cell.getCenter());
@@ -126,7 +126,7 @@ public class WeatherScheduler {
                 Bukkit.getPluginManager().callEvent(new WeatherCellMoveEvent(cell, previousCenter));
             }
         } finally {
-            // Expire cells — guaranteed to run even if processing throws
+            // Expire cells - guaranteed to run even if processing throws
             // CellManager handles onEnd and WeatherCellEndEvent
             expiring.forEach(cellManager::removeCell);
         }

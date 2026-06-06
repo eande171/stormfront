@@ -33,7 +33,7 @@ public abstract class AbstractRainType implements WeatherType {
             Integer groundY = findGroundY(world, x, feet.getBlockY(), z);
             if (groundY == null) continue;
 
-            // Skip if covered — no rain indoors
+            // Skip if covered - no rain indoors
             if (world.getHighestBlockYAt(x, z) != groundY) continue;
 
             player.spawnParticle(Particle.SPLASH,
