@@ -1,0 +1,8 @@
+name: StormfrontAPI
+version: '${version}'
+
+main: com.eande171.stormfront.api.StormfrontApiPlugin
+api-version: '1.21'
+
+description: Stormfront API — dependency for Stormfront and third-party add-ons
+authors: [ Eden Anderson ]
