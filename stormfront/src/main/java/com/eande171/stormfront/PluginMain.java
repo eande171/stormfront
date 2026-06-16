@@ -8,6 +8,7 @@ import com.eande171.stormfront.services.MessageService;
 import com.eande171.stormfront.services.PlayerDataService;
 import com.eande171.stormfront.weather.BlizzardType;
 import com.eande171.stormfront.weather.DenseFogType;
+import com.eande171.stormfront.weather.HeatwaveType;
 import com.eande171.stormfront.weather.RainfrontType;
 import com.eande171.stormfront.weather.ThunderstormType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -62,6 +63,7 @@ public final class PluginMain extends JavaPlugin {
         StormfrontAPI.get().getRegistry().register(new ThunderstormType());
         StormfrontAPI.get().getRegistry().register(new DenseFogType());
         StormfrontAPI.get().getRegistry().register(new BlizzardType());
+        StormfrontAPI.get().getRegistry().register(new HeatwaveType());
     }
 
     private void registerCommands() {
