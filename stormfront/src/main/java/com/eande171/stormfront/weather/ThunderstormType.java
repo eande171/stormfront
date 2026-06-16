@@ -25,6 +25,9 @@ public class ThunderstormType extends AbstractRainType {
     public float getThunderMultiplier() { return 0.9f; }
 
     @Override
+    public float getNaturalSpawnWeight() { return 0.6f; }
+
+    @Override
     public Set<String> getCompatibleBiomes() { return Collections.emptySet(); }
 
     @Override
@@ -35,11 +38,11 @@ public class ThunderstormType extends AbstractRainType {
 
     @Override
     public void onTick(WeatherCell cell, Player player) {
-        float distanceFactor = distanceFactor(cell, player.getLocation());
+        float distanceFactor = WeatherUtils.distanceFactor(cell, player.getLocation());
         float particleIntensity = cell.getIntensity() * distanceFactor * distanceFactor;
 
         spawnRainImpacts(player, particleIntensity);
-        applyMovementPenalty(player, particleIntensity);
+        WeatherUtils.applyMovementPenalty(player, particleIntensity, 0.1f, 0.185f, 0.015f);
         maybeStrikeLightning(player, particleIntensity);
         WeatherUtils.extinguishNearbyFires(player, particleIntensity);
     }
@@ -59,7 +62,7 @@ public class ThunderstormType extends AbstractRainType {
         double offsetX = RANDOM.nextGaussian() * 20;
         double offsetZ = RANDOM.nextGaussian() * 20;
         Location base = player.getLocation().add(offsetX, 0, offsetZ);
-        int groundY = base.getWorld().getHighestBlockYAt(base.getBlockX(), base.getBlockZ());
+        int groundY = base.getWorld().getHighestBlockYAt(base.getBlockX(), base.getBlockZ(), org.bukkit.HeightMap.MOTION_BLOCKING);
         Location strike = new Location(base.getWorld(), base.getX(), groundY, base.getZ());
         base.getWorld().strikeLightningEffect(strike);
     }

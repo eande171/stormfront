@@ -1,3 +1,27 @@
 # How often the weather scheduler runs, in ticks (20 ticks = 1 second).
 # Lower values are more responsive but more expensive. 4 is a good default.
 scheduler-interval-ticks: 4
+
+natural-generation:
+  enabled: true
+  # How often the generator checks whether to spawn weather (seconds)
+  check-interval-seconds: 180
+  # Chance (0.0-1.0) that any weather spawns on a given check
+  base-spawn-chance: 0.25
+  # Maximum number of naturally generated cells active at once
+  max-active-cells: 4
+  # Distance range from the target player that the cell centre spawns (blocks)
+  spawn-distance-min: 200
+  spawn-distance-max: 500
+  # Cell radius range (blocks)
+  radius-min: 150
+  radius-max: 350
+  # Cell intensity range (0.0-1.0)
+  intensity-min: 0.4
+  intensity-max: 1.0
+  # Cell duration range (seconds)
+  duration-min-seconds: 180
+  duration-max-seconds: 600
+  # How fast the cell drifts toward the target player (blocks per scheduler tick)
+  movement-speed-min: 0.05
+  movement-speed-max: 0.12

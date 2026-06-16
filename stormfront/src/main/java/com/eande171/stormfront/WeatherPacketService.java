@@ -46,11 +46,6 @@ public class WeatherPacketService {
         sendThunderLevel(player, 0f);
     }
 
-    public void removePlayer(UUID playerUUID) {
-        rainLevels.remove(playerUUID);
-        thunderLevels.remove(playerUUID);
-    }
-
     private float step(float current, float target) {
         if (Math.abs(current - target) < SNAP_THRESHOLD) return target;
         if (current < target) return Math.min(current + SPEED_UP, target);

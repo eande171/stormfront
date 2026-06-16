@@ -4,7 +4,6 @@ import com.eande171.stormfront.api.StormfrontAPI;
 import com.eande171.stormfront.constants.Permissions;
 import com.eande171.stormfront.registry.StormfrontImpl;
 import com.eande171.stormfront.services.ConfigService;
-import com.eande171.stormfront.services.MessageService;
 import com.eande171.stormfront.services.PlayerDataService;
 import com.eande171.stormfront.weather.BlizzardType;
 import com.eande171.stormfront.weather.DenseFogType;
@@ -23,11 +22,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class PluginMain extends JavaPlugin {
 
     @Getter private ConfigService configService;
-    @Getter private MessageService messageService;
     @Getter private PlayerDataService playerDataService;
     @Getter private CellManager cellManager;
     @Getter private WeatherPacketService weatherPacketService;
     @Getter private WeatherScheduler weatherScheduler;
+    @Getter private WeatherGenerator weatherGenerator;
 
     @Override
     public void onEnable() {
@@ -36,14 +35,14 @@ public final class PluginMain extends JavaPlugin {
         configService = new ConfigService(this);
         configService.load();
 
-        messageService = new MessageService(this);
-        messageService.load();
-
         playerDataService = new PlayerDataService();
         cellManager = new CellManager(this, playerDataService);
         weatherPacketService = new WeatherPacketService();
         weatherScheduler = new WeatherScheduler(this, cellManager, playerDataService, weatherPacketService);
         weatherScheduler.start(configService.getSchedulerIntervalTicks());
+
+        weatherGenerator = new WeatherGenerator(this, cellManager, configService);
+        weatherGenerator.start();
 
         registerWeatherTypes();
         registerListeners();

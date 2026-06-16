@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
 import java.util.Collections;
 import java.util.Random;
 import java.util.Set;
@@ -20,6 +21,9 @@ public class DenseFogType implements WeatherType {
 
     @Override
     public int getPriority() { return 1; }
+
+    @Override
+    public float getNaturalSpawnWeight() { return 0.7f; }
 
     // Fog has its own visual identity - no rain sky or thunder darkening
     @Override
@@ -39,35 +43,21 @@ public class DenseFogType implements WeatherType {
 
     @Override
     public void onTick(WeatherCell cell, Player player) {
-        float distanceFactor = distanceFactor(cell, player.getLocation());
-        float intensity = cell.getIntensity() * distanceFactor;
+        float intensity = cell.getIntensity() * WeatherUtils.distanceFactor(cell, player.getLocation());
 
-        applyMovementPenalty(player, intensity);
-        spawnFogParticles(player, intensity);
-    }
-
-    private void applyMovementPenalty(Player player, float intensity) {
-        if (!WeatherUtils.isExposed(player.getLocation())) {
-            player.setWalkSpeed(0.2f);
-            return;
-        }
         // Fog only causes disorientation at higher intensities - light fog is fine
-        if (intensity < 0.5f) {
-            player.setWalkSpeed(0.2f);
-            return;
-        }
-        // Mild effect - fog slows you by caution, not by force
-        float speed = Math.max(0.175f, 0.2f - 0.025f * intensity);
-        player.setWalkSpeed(speed);
+        WeatherUtils.applyMovementPenalty(player, intensity, 0.5f, 0.175f, 0.025f);
+        spawnFogParticles(player, intensity);
     }
 
     @Override
     public void onPlayerExit(Player player) {
-        player.setWalkSpeed(0.2f);
+        WeatherUtils.resetWalkSpeed(player);
     }
 
     private void spawnFogParticles(Player player, float intensity) {
         if (intensity <= 0) return;
+        if (!WeatherUtils.isExposed(player.getLocation())) return;
 
         Location eyes = player.getEyeLocation();
         World world = eyes.getWorld();
@@ -115,10 +105,5 @@ public class DenseFogType implements WeatherType {
                 new Location(world, x, y, z),
                 1, 0.4, 0.3, 0.4, 0.003);
         }
-    }
-
-    private float distanceFactor(WeatherCell cell, Location location) {
-        double distance = location.distance(cell.getCenter());
-        return Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
     }
 }

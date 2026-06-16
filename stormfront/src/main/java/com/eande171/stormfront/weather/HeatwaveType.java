@@ -14,7 +14,6 @@ import java.util.Set;
 public class HeatwaveType implements WeatherType {
 
     private static final Random RANDOM = new Random();
-    private static final float NORMAL_WALK_SPEED = 0.2f;
     // ~1 hunger point every 20 seconds at full intensity (scheduler default: 4 ticks)
     private static final float HUNGER_DRAIN_CHANCE = 0.01f;
 
@@ -38,6 +37,9 @@ public class HeatwaveType implements WeatherType {
     @Override
     public int getPriority() { return 2; }
 
+    @Override
+    public float getNaturalSpawnWeight() { return 0.25f; }
+
     // Clear oppressive sky - no rain or thunder visuals
     @Override
     public float getRainMultiplier() { return 0f; }
@@ -56,33 +58,34 @@ public class HeatwaveType implements WeatherType {
 
     @Override
     public void onTick(WeatherCell cell, Player player) {
-        float distanceFactor = distanceFactor(cell, player.getLocation());
-        float intensity = cell.getIntensity() * distanceFactor;
+        float intensity = cell.getIntensity() * WeatherUtils.distanceFactor(cell, player.getLocation());
 
         spawnHeatParticles(player, intensity);
-        applyMovementPenalty(player, intensity);
+        WeatherUtils.applyMovementPenalty(player, intensity, 0.1f, 0.15f, 0.05f);
         applyHungerDrain(player, intensity);
     }
 
     @Override
     public void onPlayerExit(Player player) {
-        player.setWalkSpeed(NORMAL_WALK_SPEED);
+        WeatherUtils.resetWalkSpeed(player);
     }
 
     private void spawnHeatParticles(Player player, float intensity) {
         if (intensity <= 0) return;
+        if (!WeatherUtils.isExposed(player.getLocation())) return;
 
         Location loc = player.getLocation();
         World world = loc.getWorld();
 
-        // Ground shimmer - heat rising from hot ground, hugging the surface
+        // Ground shimmer - heat rising from the actual surface below each spawn point
         int groundCount = (int) (8 * intensity);
         for (int i = 0; i < groundCount; i++) {
-            double x = loc.getX() + (RANDOM.nextDouble() - 0.5) * 8;
-            double y = loc.getY() + RANDOM.nextDouble() * 0.5;
-            double z = loc.getZ() + (RANDOM.nextDouble() - 0.5) * 8;
+            int x = (int) (loc.getX() + (RANDOM.nextDouble() - 0.5) * 8);
+            int z = (int) (loc.getZ() + (RANDOM.nextDouble() - 0.5) * 8);
+            Integer surface = WeatherUtils.findGroundY(world, x, loc.getBlockY(), z);
+            double groundY = surface != null ? surface + 1.0 : loc.getY();
             player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
-                new Location(world, x, y, z),
+                new Location(world, x + 0.5, groundY, z + 0.5),
                 1, 0.1, 0, 0.1, 0.003);
         }
 
@@ -109,20 +112,6 @@ public class HeatwaveType implements WeatherType {
         }
     }
 
-    private void applyMovementPenalty(Player player, float intensity) {
-        if (!WeatherUtils.isExposed(player.getLocation())) {
-            player.setWalkSpeed(NORMAL_WALK_SPEED);
-            return;
-        }
-        if (intensity < 0.1f) {
-            player.setWalkSpeed(NORMAL_WALK_SPEED);
-            return;
-        }
-        // Heat exhaustion - same drag as a blizzard, different cause
-        float speed = Math.max(0.15f, NORMAL_WALK_SPEED - 0.05f * intensity);
-        player.setWalkSpeed(speed);
-    }
-
     private void applyHungerDrain(Player player, float intensity) {
         if (!WeatherUtils.isExposed(player.getLocation())) return;
         // Light heatwaves are uncomfortable, not dehydrating
@@ -132,10 +121,5 @@ public class HeatwaveType implements WeatherType {
         if (current > 0) {
             player.setFoodLevel(current - 1);
         }
-    }
-
-    private float distanceFactor(WeatherCell cell, Location location) {
-        double distance = location.distance(cell.getCenter());
-        return Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
     }
 }

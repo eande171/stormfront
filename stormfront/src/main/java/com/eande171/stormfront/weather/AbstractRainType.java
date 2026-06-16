@@ -13,9 +13,6 @@ import java.util.Random;
 public abstract class AbstractRainType implements WeatherType {
 
     protected static final Random RANDOM = new Random();
-    private static final int GROUND_SCAN_DEPTH = 5;
-    private static final float NORMAL_WALK_SPEED = 0.2f;
-    private static final float MIN_WALK_SPEED = 0.185f;
 
     protected void spawnRainImpacts(Player player, float intensity) {
         int count = (int) (15 * intensity);
@@ -25,13 +22,10 @@ public abstract class AbstractRainType implements WeatherType {
         World world = feet.getWorld();
 
         for (int i = 0; i < count; i++) {
-            double offsetX = (RANDOM.nextDouble() - 0.5) * 6;
-            double offsetZ = (RANDOM.nextDouble() - 0.5) * 6;
+            int x = (int) (feet.getX() + (RANDOM.nextDouble() - 0.5) * 6);
+            int z = (int) (feet.getZ() + (RANDOM.nextDouble() - 0.5) * 6);
 
-            int x = (int) (feet.getX() + offsetX);
-            int z = (int) (feet.getZ() + offsetZ);
-
-            Integer groundY = findGroundY(world, x, feet.getBlockY(), z);
+            Integer groundY = WeatherUtils.findGroundY(world, x, feet.getBlockY(), z);
             if (groundY == null) continue;
 
             // Skip if covered - no rain indoors
@@ -43,35 +37,8 @@ public abstract class AbstractRainType implements WeatherType {
         }
     }
 
-    protected void applyMovementPenalty(Player player, float intensity) {
-        if (!WeatherUtils.isExposed(player.getLocation())) {
-            player.setWalkSpeed(NORMAL_WALK_SPEED);
-            return;
-        }
-        if (intensity < 0.1f) {
-            player.setWalkSpeed(NORMAL_WALK_SPEED);
-            return;
-        }
-        float speed = Math.max(MIN_WALK_SPEED, NORMAL_WALK_SPEED - 0.015f * intensity);
-        player.setWalkSpeed(speed);
-    }
-
     @Override
     public void onPlayerExit(Player player) {
-        player.setWalkSpeed(NORMAL_WALK_SPEED);
-    }
-
-    protected float distanceFactor(WeatherCell cell, Location location) {
-        double distance = location.distance(cell.getCenter());
-        return Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
-    }
-
-    private Integer findGroundY(World world, int x, int startY, int z) {
-        for (int y = startY; y >= startY - GROUND_SCAN_DEPTH; y--) {
-            if (!world.getBlockAt(x, y, z).getType().isAir()) {
-                return y;
-            }
-        }
-        return null;
+        WeatherUtils.resetWalkSpeed(player);
     }
 }

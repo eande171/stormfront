@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
 import java.util.Random;
 import java.util.Set;
 
@@ -38,6 +39,9 @@ public class BlizzardType implements WeatherType {
     @Override
     public int getPriority() { return 2; }
 
+    @Override
+    public float getNaturalSpawnWeight() { return 0.25f; }
+
     // Full precipitation - shows vanilla snow in cold biomes, fades in/out via WeatherPacketService
     @Override
     public float getRainMultiplier() { return 1.0f; }
@@ -57,20 +61,19 @@ public class BlizzardType implements WeatherType {
 
     @Override
     public void onTick(WeatherCell cell, Player player) {
-        float distanceFactor = distanceFactor(cell, player.getLocation());
-        float intensity = cell.getIntensity() * distanceFactor;
+        float intensity = cell.getIntensity() * WeatherUtils.distanceFactor(cell, player.getLocation());
 
         spawnSnowflakes(player, intensity);
         spawnGroundDrift(player, intensity);
         applyFreezeEffect(player, intensity);
-        applyMovementPenalty(player, intensity);
+        WeatherUtils.applyMovementPenalty(player, intensity, 0.1f, 0.15f, 0.05f);
         WeatherUtils.extinguishNearbyFires(player, intensity);
     }
 
     @Override
     public void onPlayerExit(Player player) {
         player.setFreezeTicks(0);
-        player.setWalkSpeed(0.2f);
+        WeatherUtils.resetWalkSpeed(player);
     }
 
     @Override
@@ -81,6 +84,7 @@ public class BlizzardType implements WeatherType {
     }
 
     private void spawnSnowflakes(Player player, float intensity) {
+        if (!WeatherUtils.isExposed(player.getLocation())) return;
         int count = (int) (20 * intensity);
         if (count <= 0) return;
 
@@ -99,6 +103,7 @@ public class BlizzardType implements WeatherType {
     }
 
     private void spawnGroundDrift(Player player, float intensity) {
+        if (!WeatherUtils.isExposed(player.getLocation())) return;
         int count = (int) (12 * intensity);
         if (count <= 0) return;
 
@@ -106,12 +111,13 @@ public class BlizzardType implements WeatherType {
         World world = loc.getWorld();
 
         for (int i = 0; i < count; i++) {
-            double x = loc.getX() + (RANDOM.nextDouble() - 0.5) * 10;
-            double y = loc.getY() + RANDOM.nextDouble() * 1.5;
-            double z = loc.getZ() + (RANDOM.nextDouble() - 0.5) * 10;
+            int x = (int) (loc.getX() + (RANDOM.nextDouble() - 0.5) * 10);
+            int z = (int) (loc.getZ() + (RANDOM.nextDouble() - 0.5) * 10);
+            Integer surface = WeatherUtils.findGroundY(world, x, loc.getBlockY(), z);
+            double groundY = surface != null ? surface + 1.0 : loc.getY();
             // Higher speed than fog drift - ground snow is blown around by wind
             player.spawnParticle(Particle.CLOUD,
-                new Location(world, x, y, z),
+                new Location(world, x + 0.5, groundY, z + 0.5),
                 1, 0.3, 0.05, 0.3, 0.025);
         }
     }
@@ -121,24 +127,5 @@ public class BlizzardType implements WeatherType {
         if (!WeatherUtils.isExposed(player.getLocation())) return;
         int target = (int) (player.getMaxFreezeTicks() * intensity);
         player.setFreezeTicks(target);
-    }
-
-    private void applyMovementPenalty(Player player, float intensity) {
-        if (!WeatherUtils.isExposed(player.getLocation())) {
-            player.setWalkSpeed(0.2f);
-            return;
-        }
-        if (intensity < 0.1f) {
-            player.setWalkSpeed(0.2f);
-            return;
-        }
-        // Blizzard is harsher than rain - significant drag from deep snow and wind
-        float speed = Math.max(0.15f, 0.2f - 0.05f * intensity);
-        player.setWalkSpeed(speed);
-    }
-
-    private float distanceFactor(WeatherCell cell, Location location) {
-        double distance = location.distance(cell.getCenter());
-        return Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
     }
 }

@@ -32,4 +32,7 @@ public interface WeatherType {
     Set<String> getCompatibleBiomes();
 
     int getPriority();
+
+    // Relative chance this type is selected during natural generation (0.0 = never, 1.0 = full weight)
+    default float getNaturalSpawnWeight() { return 1.0f; }
 }

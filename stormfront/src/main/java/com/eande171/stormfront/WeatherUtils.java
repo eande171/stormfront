@@ -1,5 +1,6 @@
 package com.eande171.stormfront;
 
+import com.eande171.stormfront.api.WeatherCell;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,15 +15,11 @@ public final class WeatherUtils {
 
     private static final Random RANDOM = new Random();
 
-    // Normal campfire goes out fairly quickly in heavy rain
+    public static final float NORMAL_WALK_SPEED = 0.2f;
+
     private static final float CAMPFIRE_EXTINGUISH_CHANCE = 0.15f;
-
-    // Soul fire is supernatural - rain barely touches it
     private static final float SOUL_CAMPFIRE_EXTINGUISH_CHANCE = 0.03f;
-
-    // Loose fire blocks are snuffed out faster than a sheltered flame
     private static final float FIRE_EXTINGUISH_CHANCE = 0.20f;
-
     private static final int FIRE_SCAN_RADIUS = 6;
 
     private WeatherUtils() {}
@@ -40,6 +37,44 @@ public final class WeatherUtils {
             HeightMap.MOTION_BLOCKING_NO_LEAVES
         );
         return highestY <= location.getBlockY();
+    }
+
+    public static float distanceFactor(WeatherCell cell, Location location) {
+        double distance = location.distance(cell.getCenter());
+        return Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
+    }
+
+    /**
+     * Scans downward from playerY and returns the Y of the highest solid block found,
+     * or null if nothing is found within 8 blocks.
+     */
+    public static Integer findGroundY(World world, int x, int playerY, int z) {
+        for (int y = playerY; y >= playerY - 8; y--) {
+            if (!world.getBlockAt(x, y, z).getType().isAir()) {
+                return y;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Applies a walk speed penalty scaled by intensity. Only affects exposed players.
+     * Restores normal speed if the player is indoors or below the threshold.
+     */
+    public static void applyMovementPenalty(Player player, float intensity, float threshold, float minSpeed, float slope) {
+        if (!isExposed(player.getLocation())) {
+            player.setWalkSpeed(NORMAL_WALK_SPEED);
+            return;
+        }
+        if (intensity < threshold) {
+            player.setWalkSpeed(NORMAL_WALK_SPEED);
+            return;
+        }
+        player.setWalkSpeed(Math.max(minSpeed, NORMAL_WALK_SPEED - slope * intensity));
+    }
+
+    public static void resetWalkSpeed(Player player) {
+        player.setWalkSpeed(NORMAL_WALK_SPEED);
     }
 
     /**
