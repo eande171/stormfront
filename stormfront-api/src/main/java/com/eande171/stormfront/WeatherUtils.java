@@ -24,10 +24,8 @@ public final class WeatherUtils {
 
     private WeatherUtils() {}
 
-    /**
-     * Returns true if the location has a clear view of the sky.
-     * Uses MOTION_BLOCKING_NO_LEAVES so players under trees still count as exposed.
-     */
+    // Returns true if the location has a clear view of the sky.
+    // Uses MOTION_BLOCKING_NO_LEAVES so players under trees still count as exposed.
     public static boolean isExposed(Location location) {
         World world = location.getWorld();
         if (world == null) return false;
@@ -44,10 +42,8 @@ public final class WeatherUtils {
         return Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
     }
 
-    /**
-     * Scans downward from playerY and returns the Y of the highest solid block found,
-     * or null if nothing is found within 8 blocks.
-     */
+    // Scans downward from playerY and returns the Y of the highest solid block found,
+    // or null if nothing is found within 8 blocks.
     public static Integer findGroundY(World world, int x, int playerY, int z) {
         for (int y = playerY; y >= playerY - 8; y--) {
             if (!world.getBlockAt(x, y, z).getType().isAir()) {
@@ -57,10 +53,8 @@ public final class WeatherUtils {
         return null;
     }
 
-    /**
-     * Applies a walk speed penalty scaled by intensity. Only affects exposed players.
-     * Restores normal speed if the player is indoors or below the threshold.
-     */
+    // Applies a walk speed penalty scaled by intensity. Only affects exposed players.
+    // Restores normal speed if the player is indoors or below the threshold.
     public static void applyMovementPenalty(Player player, float intensity, float threshold, float minSpeed, float slope) {
         if (!isExposed(player.getLocation())) {
             player.setWalkSpeed(NORMAL_WALK_SPEED);
@@ -77,11 +71,9 @@ public final class WeatherUtils {
         player.setWalkSpeed(NORMAL_WALK_SPEED);
     }
 
-    /**
-     * Samples random block positions near the player and attempts to extinguish
-     * exposed campfires and fire blocks. Soul campfires resist significantly more.
-     * Scales the number of attempts with intensity so heavy rain acts faster.
-     */
+    // Samples random block positions near the player and attempts to extinguish
+    // exposed campfires and fire blocks. Soul campfires resist significantly more.
+    // Scales the number of attempts with intensity so heavy rain acts faster.
     public static void extinguishNearbyFires(Player player, float intensity) {
         if (intensity <= 0) return;
 

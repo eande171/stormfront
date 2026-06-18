@@ -19,4 +19,6 @@ public abstract class StormfrontAPI {
     }
 
     public abstract WeatherRegistry getRegistry();
+
+    public abstract com.eande171.stormfront.CellManager getCellManager();
 }

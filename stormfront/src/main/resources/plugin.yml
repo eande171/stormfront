@@ -8,9 +8,4 @@ load: POSTWORLD
 description: Dynamic weather plugin for Paper servers
 authors: [ Eden Anderson ]
 
-depend: [ StormfrontAPI, packetevents ]
-
-permissions:
-  stormfront.admin:
-    description: Allows use of all Stormfront commands
-    default: op
+depend: [ StormfrontAPI ]

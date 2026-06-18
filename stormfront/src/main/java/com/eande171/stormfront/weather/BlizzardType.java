@@ -9,8 +9,11 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 public class BlizzardType implements WeatherType {
 
@@ -72,6 +75,7 @@ public class BlizzardType implements WeatherType {
 
     @Override
     public void onPlayerExit(Player player) {
+        freezeLevels.remove(player.getUniqueId());
         player.setFreezeTicks(0);
         WeatherUtils.resetWalkSpeed(player);
     }
@@ -122,10 +126,28 @@ public class BlizzardType implements WeatherType {
         }
     }
 
+    // Ticks added to our tracker per scheduler tick - full freeze in ~12s at 4-tick interval
+    private static final int FREEZE_RATE = 3;
+    private final Map<UUID, Integer> freezeLevels = new HashMap<>();
+
     private void applyFreezeEffect(Player player, float intensity) {
-        if (intensity <= 0) return;
-        if (!WeatherUtils.isExposed(player.getLocation())) return;
+        UUID uuid = player.getUniqueId();
+
+        if (intensity <= 0) {
+            freezeLevels.remove(uuid);
+            return;
+        }
+
+        if (!WeatherUtils.isExposed(player.getLocation())) {
+            // Sync tracker to vanilla drain so buildup resumes from the right level when exposed again
+            freezeLevels.put(uuid, player.getFreezeTicks());
+            return;
+        }
+
         int target = (int) (player.getMaxFreezeTicks() * intensity);
-        player.setFreezeTicks(target);
+        int current = freezeLevels.getOrDefault(uuid, player.getFreezeTicks());
+        int next = Math.min(current + FREEZE_RATE, target);
+        freezeLevels.put(uuid, next);
+        player.setFreezeTicks(next);
     }
 }

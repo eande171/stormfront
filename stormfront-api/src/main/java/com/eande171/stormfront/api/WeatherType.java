@@ -35,4 +35,7 @@ public interface WeatherType {
 
     // Relative chance this type is selected during natural generation (0.0 = never, 1.0 = full weight)
     default float getNaturalSpawnWeight() { return 1.0f; }
+
+    // Additional spawn condition checked before weighted selection — return false to block natural spawning
+    default boolean canNaturallySpawn(Player target) { return true; }
 }

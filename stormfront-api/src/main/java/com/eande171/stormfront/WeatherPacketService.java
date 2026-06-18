@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public class WeatherPacketService {
 
-    private static final float SPEED_UP   = 0.04f;   // ~5 seconds to full
-    private static final float SPEED_DOWN = 0.013f;  // ~15 seconds to clear
+    private static final float SPEED_UP   = 0.04f;  // ~5 seconds to full
+    private static final float SPEED_DOWN = 0.013f; // ~15 seconds to clear
     private static final float SNAP_THRESHOLD = 0.01f;
 
     private final Map<UUID, Float> rainLevels    = new HashMap<>();

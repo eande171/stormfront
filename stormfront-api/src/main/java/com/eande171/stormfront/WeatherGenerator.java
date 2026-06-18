@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class WeatherGenerator {
 
     private static final Random RANDOM = new Random();
 
-    private final PluginMain plugin;
+    private final JavaPlugin plugin;
     private final CellManager cellManager;
     private final ConfigService configService;
 
@@ -44,13 +45,13 @@ public class WeatherGenerator {
         List<WeatherType> eligible = StormfrontAPI.get().getRegistry().getAll().stream()
             .filter(type -> type.getNaturalSpawnWeight() > 0)
             .filter(type -> type.getCompatibleBiomes().isEmpty() || type.getCompatibleBiomes().contains(biome))
+            .filter(type -> type.canNaturallySpawn(target))
             .collect(Collectors.toList());
 
         if (eligible.isEmpty()) return;
 
         WeatherType selected = selectWeighted(eligible);
 
-        // Spawn at a random position away from the target player
         double distance = configService.getNaturalGenSpawnDistanceMin()
             + RANDOM.nextDouble() * (configService.getNaturalGenSpawnDistanceMax() - configService.getNaturalGenSpawnDistanceMin());
         double angle = RANDOM.nextDouble() * Math.PI * 2;

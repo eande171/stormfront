@@ -20,7 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CellManager {
 
-    private final PluginMain plugin;
     private final PlayerDataService playerDataService;
     private final Map<UUID, WeatherCell> activeCells = new HashMap<>();
 
@@ -33,7 +32,7 @@ public class CellManager {
     public void removeCell(UUID id) {
         WeatherCell cell = activeCells.remove(id);
         if (cell == null) return;
-        // Fire exit events for any player currently tracked as being inside this cell.
+        // Fire exit events for any player currently tracked inside this cell.
         // The scheduler's diff logic can't do this because by its next tick the cell is gone.
         for (Player player : Bukkit.getOnlinePlayers()) {
             Set<UUID> tracked = playerDataService.getCellIds(player.getUniqueId());

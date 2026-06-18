@@ -1,6 +1,5 @@
 package com.eande171.stormfront;
 
-import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.events.PlayerEnterWeatherCellEvent;
 import com.eande171.stormfront.api.events.PlayerExitWeatherCellEvent;
@@ -18,7 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class PluginListener implements Listener {
+public class EngineListener implements Listener {
 
     private final PlayerDataService playerDataService;
     private final WeatherPacketService weatherPacketService;
@@ -36,7 +35,8 @@ public class PluginListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().setWalkSpeed(0.2f);
+        // Reset walk speed in case it was persisted from a previous session
+        event.getPlayer().setWalkSpeed(WeatherUtils.NORMAL_WALK_SPEED);
     }
 
     @EventHandler
@@ -55,7 +55,7 @@ public class PluginListener implements Listener {
     @EventHandler
     public void onEntityCombust(EntityCombustEvent event) {
         Entity entity = event.getEntity();
-        // Covered entities aren't in sunlight - no need to intervene
+        // Covered entities are not in sunlight - no need to intervene
         if (!WeatherUtils.isExposed(entity.getLocation())) return;
         for (WeatherCell cell : cellManager.getActiveCells()) {
             if (!entity.getWorld().equals(cell.getCenter().getWorld())) continue;

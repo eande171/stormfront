@@ -4,5 +4,12 @@ version: '${version}'
 main: com.eande171.stormfront.api.StormfrontApiPlugin
 api-version: '1.21'
 
-description: Stormfront API — dependency for Stormfront and third-party add-ons
+description: Stormfront API - engine and dependency for Stormfront weather packs and add-ons
 authors: [ Eden Anderson ]
+
+depend: [ packetevents ]
+
+permissions:
+  stormfront.admin:
+    description: Allows use of all Stormfront commands
+    default: op

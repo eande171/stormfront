@@ -11,13 +11,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 @RequiredArgsConstructor
 public class WeatherScheduler {
 
-    private final PluginMain plugin;
+    private final JavaPlugin plugin;
     private final CellManager cellManager;
     private final PlayerDataService playerDataService;
     private final WeatherPacketService weatherPacketService;
@@ -33,7 +34,6 @@ public class WeatherScheduler {
             cellMap.put(cell.getId(), cell);
         }
 
-        // Determine which cells are expiring this tick.
         // startedAt is an epoch-ms timestamp; duration is in ticks (1 tick = 50 ms).
         Set<UUID> expiring = new HashSet<>();
         long nowMs = System.currentTimeMillis();
@@ -46,7 +46,6 @@ public class WeatherScheduler {
         }
 
         try {
-            // Process each online player
             for (Player player : Bukkit.getOnlinePlayers()) {
                 UUID playerUUID = player.getUniqueId();
                 Set<UUID> previous = playerDataService.getCellIds(playerUUID);
@@ -60,7 +59,6 @@ public class WeatherScheduler {
                     }
                 }
 
-                // Fire enter events for newly entered cells
                 for (UUID id : current) {
                     if (!previous.contains(id)) {
                         Bukkit.getPluginManager().callEvent(
@@ -103,7 +101,6 @@ public class WeatherScheduler {
                 weatherPacketService.tick(player, targetRain, targetThunder);
             }
 
-            // Process nearby entities for each active, non-expiring cell
             for (WeatherCell cell : cellMap.values()) {
                 if (expiring.contains(cell.getId())) continue;
                 Location center = cell.getCenter();
@@ -118,7 +115,6 @@ public class WeatherScheduler {
                 }
             }
 
-            // Move non-expiring cells by their movement vector
             for (WeatherCell cell : cellMap.values()) {
                 if (expiring.contains(cell.getId())) continue;
                 Location previousCenter = cell.getCenter().clone();
@@ -126,8 +122,8 @@ public class WeatherScheduler {
                 Bukkit.getPluginManager().callEvent(new WeatherCellMoveEvent(cell, previousCenter));
             }
         } finally {
-            // Expire cells - guaranteed to run even if processing throws
-            // CellManager handles onEnd and WeatherCellEndEvent
+            // Expire cells - guaranteed to run even if processing throws.
+            // CellManager handles onEnd and WeatherCellEndEvent.
             expiring.forEach(cellManager::removeCell);
         }
     }

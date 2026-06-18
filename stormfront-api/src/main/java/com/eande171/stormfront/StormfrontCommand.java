@@ -7,7 +7,6 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -19,14 +18,11 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 public class StormfrontCommand {
 
     private static final int DEFAULT_RADIUS = 50;
     private static final float DEFAULT_INTENSITY = 1.0f;
     private static final int DEFAULT_DURATION_SECONDS = -1; // indefinite
-
-    private final CellManager cellManager;
 
     public int onSpawn(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
@@ -59,7 +55,7 @@ public class StormfrontCommand {
             .duration(durationTicks)
             .build();
 
-        cellManager.addCell(cell);
+        StormfrontAPI.get().getCellManager().addCell(cell);
 
         String durationStr = durationTicks == -1 ? "indefinite" : durationSeconds + "s";
         sender.sendMessage("Spawned '" + typeId + "' (radius=" + radius + ", intensity=" + intensity + ", duration=" + durationStr + ").");
@@ -68,6 +64,7 @@ public class StormfrontCommand {
 
     public int onStop(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
+        CellManager cellManager = StormfrontAPI.get().getCellManager();
         int count = cellManager.getActiveCells().size();
         new ArrayList<>(cellManager.getActiveCells())
             .forEach(cell -> cellManager.removeCell(cell.getId()));
@@ -77,7 +74,7 @@ public class StormfrontCommand {
 
     public int onList(CommandContext<CommandSourceStack> ctx) {
         CommandSender sender = ctx.getSource().getSender();
-        Collection<WeatherCell> cells = cellManager.getActiveCells();
+        Collection<WeatherCell> cells = StormfrontAPI.get().getCellManager().getActiveCells();
 
         if (cells.isEmpty()) {
             sender.sendMessage("No active weather cells.");
