@@ -2,6 +2,6 @@
 types:
   rainfront: true
   thunderstorm: true
-  dense-fog: true
+  miasma: true
   blizzard: true
   heatwave: true

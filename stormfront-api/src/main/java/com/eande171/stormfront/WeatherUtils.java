@@ -10,12 +10,28 @@ import org.bukkit.block.data.Lightable;
 import org.bukkit.entity.Player;
 
 import java.util.Random;
+import java.util.Set;
 
 public final class WeatherUtils {
 
     private static final Random RANDOM = new Random();
 
     public static final float NORMAL_WALK_SPEED = 0.2f;
+
+    // Biomes where precipitation does not occur - rain effects should not apply here
+    private static final Set<String> DRY_BIOMES = Set.of(
+        "minecraft:desert",
+        "minecraft:badlands",
+        "minecraft:wooded_badlands",
+        "minecraft:eroded_badlands",
+        "minecraft:savanna",
+        "minecraft:savanna_plateau",
+        "minecraft:windswept_savanna"
+    );
+
+    public static boolean isDryBiome(Location location) {
+        return DRY_BIOMES.contains(location.getBlock().getBiome().getKey().toString());
+    }
 
     private static final float CAMPFIRE_EXTINGUISH_CHANCE = 0.15f;
     private static final float SOUL_CAMPFIRE_EXTINGUISH_CHANCE = 0.03f;

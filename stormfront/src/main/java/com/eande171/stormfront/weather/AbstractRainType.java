@@ -15,6 +15,7 @@ public abstract class AbstractRainType implements WeatherType {
     protected static final Random RANDOM = new Random();
 
     protected void spawnRainImpacts(Player player, float intensity) {
+        if (WeatherUtils.isDryBiome(player.getLocation())) return;
         int count = (int) (15 * intensity);
         if (count <= 0) return;
 
@@ -31,6 +32,21 @@ public abstract class AbstractRainType implements WeatherType {
             // Skip if covered - no rain indoors
             if (world.getHighestBlockYAt(x, z) != groundY) continue;
 
+            player.spawnParticle(Particle.SPLASH,
+                new Location(world, x + 0.5, groundY + 1, z + 0.5),
+                1, 0.2, 0, 0.2, 0);
+        }
+
+        // Distant impacts - sparse, large radius, appear stationary as the player approaches
+        int distantCount = Math.max(1, (int) (3 * intensity));
+        for (int i = 0; i < distantCount; i++) {
+            double angle = RANDOM.nextDouble() * Math.PI * 2;
+            double dist = 30 + RANDOM.nextDouble() * 20;
+            int x = (int) (feet.getX() + dist * Math.cos(angle));
+            int z = (int) (feet.getZ() + dist * Math.sin(angle));
+            Integer groundY = WeatherUtils.findGroundY(world, x, feet.getBlockY(), z);
+            if (groundY == null) continue;
+            if (world.getHighestBlockYAt(x, z) != groundY) continue;
             player.spawnParticle(Particle.SPLASH,
                 new Location(world, x + 0.5, groundY + 1, z + 0.5),
                 1, 0.2, 0, 0.2, 0);

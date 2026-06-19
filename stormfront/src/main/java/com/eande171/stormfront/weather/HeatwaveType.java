@@ -100,12 +100,14 @@ public class HeatwaveType implements WeatherType {
                 1, 0.3, 0.1, 0.3, 0.005);
         }
 
-        // Far haze - distant shimmer at the edge of visibility
-        int farCount = (int) (5 * intensity);
+        // Far haze - distant shimmer, 35-50 blocks out, appears stationary as player approaches
+        int farCount = (int) (10 * intensity);
         for (int i = 0; i < farCount; i++) {
-            double x = loc.getX() + (RANDOM.nextDouble() - 0.5) * 24;
+            double angle = RANDOM.nextDouble() * Math.PI * 2;
+            double dist = 35 + RANDOM.nextDouble() * 15;
+            double x = loc.getX() + dist * Math.cos(angle);
             double y = loc.getY() + (RANDOM.nextDouble() - 0.2) * 4;
-            double z = loc.getZ() + (RANDOM.nextDouble() - 0.5) * 24;
+            double z = loc.getZ() + dist * Math.sin(angle);
             player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
                 new Location(world, x, y, z),
                 1, 0.4, 0.2, 0.4, 0.004);

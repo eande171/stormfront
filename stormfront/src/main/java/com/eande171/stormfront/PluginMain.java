@@ -3,8 +3,8 @@ package com.eande171.stormfront;
 import com.eande171.stormfront.api.StormfrontAPI;
 import com.eande171.stormfront.api.WeatherType;
 import com.eande171.stormfront.weather.BlizzardType;
-import com.eande171.stormfront.weather.DenseFogType;
 import com.eande171.stormfront.weather.HeatwaveType;
+import com.eande171.stormfront.weather.MiasmaType;
 import com.eande171.stormfront.weather.RainfrontType;
 import com.eande171.stormfront.weather.ThunderstormType;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -29,7 +29,7 @@ public final class PluginMain extends JavaPlugin {
         FileConfiguration config = getConfig();
         maybeRegister(config, "types.rainfront",    new RainfrontType());
         maybeRegister(config, "types.thunderstorm", new ThunderstormType());
-        maybeRegister(config, "types.dense-fog",    new DenseFogType());
+        maybeRegister(config, "types.miasma",        new MiasmaType());
         maybeRegister(config, "types.blizzard",     new BlizzardType());
         maybeRegister(config, "types.heatwave",     new HeatwaveType());
     }

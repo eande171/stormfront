@@ -21,6 +21,11 @@ public class RainfrontType extends AbstractRainType {
     public Set<String> getCompatibleBiomes() { return Collections.emptySet(); }
 
     @Override
+    public boolean canNaturallySpawn(Player target) {
+        return !WeatherUtils.isDryBiome(target.getLocation());
+    }
+
+    @Override
     public void onStart(WeatherCell cell) {}
 
     @Override
@@ -39,7 +44,7 @@ public class RainfrontType extends AbstractRainType {
 
     @Override
     public void onEntityTick(WeatherCell cell, LivingEntity entity) {
-        if (entity instanceof Enderman) {
+        if (entity instanceof Enderman && !WeatherUtils.isDryBiome(entity.getLocation())) {
             entity.damage(1.0);
         }
     }
