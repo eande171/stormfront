@@ -129,6 +129,19 @@ public class MiasmaType implements WeatherType {
                 1, 0.1, 0.05, 0.1, 0.003);
         }
 
+        // Spore blossom drift - wide radius, spawned above head height so they fall through the gas
+        int sporeCount = (int) (7 * intensity);
+        for (int i = 0; i < sporeCount; i++) {
+            double angle = RANDOM.nextDouble() * Math.PI * 2;
+            double dist = 10 + RANDOM.nextDouble() * 10;
+            double x = feet.getX() + dist * Math.cos(angle);
+            double y = feet.getY() + 3 + RANDOM.nextDouble() * 2;
+            double z = feet.getZ() + dist * Math.sin(angle);
+            player.spawnParticle(Particle.SPORE_BLOSSOM_AIR,
+                new Location(world, x, y, z),
+                1, 0.2, 0.1, 0.2, 0);
+        }
+
         // Distant mist - sparse, 35-50 blocks out, appears stationary as player approaches
         int distantCount = Math.max(2, (int) (5 * intensity));
         for (int i = 0; i < distantCount; i++) {
