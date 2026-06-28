@@ -11,8 +11,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 public class MiasmaType implements WeatherType {
 
@@ -61,15 +64,32 @@ public class MiasmaType implements WeatherType {
     @Override
     public void onPlayerExit(Player player) {
         player.removePotionEffect(PotionEffectType.NAUSEA);
+        nauseaExpiredAt.remove(player.getUniqueId());
     }
 
+    private static final int  NAUSEA_DURATION  = 130; // 6.5 seconds
+    private static final long NAUSEA_GAP_MS    = 3500; // 3.5 second gap between pulses
+
+    private final Map<UUID, Long> nauseaExpiredAt = new HashMap<>();
+
     private void applyNausea(Player player, float intensity) {
-        if (intensity < NAUSEA_THRESHOLD || !WeatherUtils.isExposed(player.getLocation())) {
+        UUID uuid = player.getUniqueId();
+        if (intensity < NAUSEA_THRESHOLD) {
             player.removePotionEffect(PotionEffectType.NAUSEA);
+            nauseaExpiredAt.remove(uuid);
             return;
         }
-        // No icon, no ambient particles - just the screen warp
-        player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 60, 0, false, false, false));
+        PotionEffect existing = player.getPotionEffect(PotionEffectType.NAUSEA);
+        if (existing != null) return;
+        // Nausea just expired - record the time and start the gap
+        long now = System.currentTimeMillis();
+        if (!nauseaExpiredAt.containsKey(uuid)) {
+            nauseaExpiredAt.put(uuid, now);
+            return;
+        }
+        if (now - nauseaExpiredAt.get(uuid) < NAUSEA_GAP_MS) return;
+        nauseaExpiredAt.remove(uuid);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, NAUSEA_DURATION, 0, false, false, false));
     }
 
     private void spawnMiasmaParticles(Player player, float intensity) {
