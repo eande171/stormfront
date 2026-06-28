@@ -54,11 +54,6 @@ public class ThunderstormType extends AbstractRainType {
     }
 
     @Override
-    public void onPlayerExit(Player player) {
-        super.onPlayerExit(player);
-    }
-
-    @Override
     public void onEntityTick(WeatherCell cell, LivingEntity entity) {
         if (entity instanceof Enderman && !WeatherUtils.isDryBiome(entity.getLocation())) {
             entity.damage(1.0);

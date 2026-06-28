@@ -3,6 +3,7 @@ package com.eande171.stormfront.weather;
 import com.eande171.stormfront.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
+import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -30,7 +31,7 @@ public abstract class AbstractRainType implements WeatherType {
             if (groundY == null) continue;
 
             // Skip if covered - no rain indoors
-            if (world.getHighestBlockYAt(x, z) != groundY) continue;
+            if (world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES) != groundY) continue;
 
             player.spawnParticle(Particle.SPLASH,
                 new Location(world, x + 0.5, groundY + 1, z + 0.5),
@@ -46,7 +47,7 @@ public abstract class AbstractRainType implements WeatherType {
             int z = (int) (feet.getZ() + dist * Math.sin(angle));
             Integer groundY = WeatherUtils.findGroundY(world, x, feet.getBlockY(), z);
             if (groundY == null) continue;
-            if (world.getHighestBlockYAt(x, z) != groundY) continue;
+            if (world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES) != groundY) continue;
             player.spawnParticle(Particle.SPLASH,
                 new Location(world, x + 0.5, groundY + 1, z + 0.5),
                 1, 0.2, 0, 0.2, 0);

@@ -50,7 +50,7 @@ public final class WeatherUtils {
             location.getBlockZ(),
             HeightMap.MOTION_BLOCKING_NO_LEAVES
         );
-        return highestY <= location.getBlockY();
+        return highestY < location.getBlockY();
     }
 
     public static float distanceFactor(WeatherCell cell, Location location) {

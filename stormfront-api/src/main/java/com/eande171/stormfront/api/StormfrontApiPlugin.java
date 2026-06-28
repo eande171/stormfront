@@ -16,9 +16,12 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class StormfrontApiPlugin extends JavaPlugin {
+
+    private WeatherPacketService weatherPacketService;
 
     @Override
     public void onEnable() {
@@ -30,7 +33,7 @@ public final class StormfrontApiPlugin extends JavaPlugin {
 
         StormfrontAPI.setInstance(new StormfrontImpl(cellManager));
 
-        WeatherPacketService weatherPacketService = new WeatherPacketService();
+        weatherPacketService = new WeatherPacketService();
         WeatherScheduler weatherScheduler = new WeatherScheduler(this, cellManager, playerDataService, weatherPacketService);
         weatherScheduler.start(configService.getSchedulerIntervalTicks());
 
@@ -51,6 +54,11 @@ public final class StormfrontApiPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (weatherPacketService != null) {
+            for (Player player : getServer().getOnlinePlayers()) {
+                weatherPacketService.reset(player);
+            }
+        }
         getLogger().info("Stormfront API disabled. Version: " + getPluginMeta().getVersion());
     }
 

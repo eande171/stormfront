@@ -97,9 +97,9 @@ public class WeatherGenerator {
         double totalWeight = types.stream().mapToDouble(WeatherType::getNaturalSpawnWeight).sum();
         double roll = RANDOM.nextDouble() * totalWeight;
         double cumulative = 0;
-        for (WeatherType type : types) {
-            cumulative += type.getNaturalSpawnWeight();
-            if (roll <= cumulative) return type;
+        for (int i = 0; i < types.size() - 1; i++) {
+            cumulative += types.get(i).getNaturalSpawnWeight();
+            if (roll < cumulative) return types.get(i);
         }
         return types.getLast();
     }

@@ -6,7 +6,7 @@
 
     <groupId>com.eande171</groupId>
     <artifactId>stormfront-parent</artifactId>
-    <version>1.0</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <name>Stormfront</name>

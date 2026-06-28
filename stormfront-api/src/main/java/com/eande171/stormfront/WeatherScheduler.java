@@ -77,6 +77,9 @@ public class WeatherScheduler {
                     }
                 }
 
+                // Must update before the finally block - removeCell fires onPlayerExit, which reads
+                // the player's cell set. Updating here ensures expiring cells are already excluded,
+                // so removeCell does not fire a second exit event for them.
                 playerDataService.setCellIds(playerUUID, current);
 
                 Optional<WeatherCell> priorityCell = current.stream()

@@ -2,7 +2,7 @@ package com.eande171.stormfront.api;
 
 public abstract class StormfrontAPI {
 
-    private static StormfrontAPI instance;
+    private static volatile StormfrontAPI instance;
 
     public static StormfrontAPI get() {
         if (instance == null) {
