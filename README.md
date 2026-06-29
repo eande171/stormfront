@@ -2,8 +2,6 @@
 
 Stormfront replaces Minecraft's global vanilla weather system with dynamic, per-player weather cells. Each cell has its own type, position, radius, and intensity, meaning two players in the same world can experience completely different weather simultaneously.
 
----
-
 ## Features
 
 - **Rainfront:** rain impacts, movement slowdown, campfire extinguishing
@@ -14,22 +12,18 @@ Stormfront replaces Minecraft's global vanilla weather system with dynamic, per-
 - **Fully configurable:** enable or disable individual weather types in config.yml
 - **API included:** register custom weather types from your own plugin
 
----
-
 ## Requirements
 
-- **Paper** 1.21.1.1 (other versions untested)
-
----
+- **Paper** 1.21.11 or newer
+- **PacketEvents**
 
 ## Installation
 
-1. Drop `stormfront-x.x.jar` into your server's `plugins/` folder
-2. Restart the server. `plugins/Stormfront/config.yml` will be generated.
-3. Enable or disable weather types as needed.
-4. Use `/stormfront spawn` to test.
-
----
+1. Install [PacketEvents](https://modrinth.com/plugin/packetevents) if not already present
+2. Drop `stormfront-api-x.x.x.jar` and `stormfront-x.x.x.jar` into your server's `plugins/` folder
+3. Restart the server. `plugins/Stormfront/config.yml` will be generated.
+4. Enable or disable weather types as needed.
+5. Use `/stormfront spawn` to test.
 
 ## Commands
 
@@ -43,15 +37,11 @@ All commands require the `stormfront.admin` permission.
 
 **Spawn defaults:** radius=50, intensity=1.0, duration=indefinite
 
----
-
 ## Permissions
 
 | Permission | Description | Default |
 |---|---|---|
 | `stormfront.admin` | Access to all `/stormfront` commands | OP |
-
----
 
 ## Configuration
 
@@ -66,8 +56,6 @@ types:
   blizzard: true
   heatwave: true
 ```
-
----
 
 ## API
 
