@@ -4,12 +4,12 @@ import com.eande171.stormfront.CellManager;
 import com.eande171.stormfront.EngineListener;
 import com.eande171.stormfront.StormfrontCommand;
 import com.eande171.stormfront.WeatherGenerator;
-import com.eande171.stormfront.WeatherPacketService;
 import com.eande171.stormfront.WeatherScheduler;
 import com.eande171.stormfront.constants.Permissions;
 import com.eande171.stormfront.registry.StormfrontImpl;
 import com.eande171.stormfront.services.ConfigService;
 import com.eande171.stormfront.services.PlayerDataService;
+import com.eande171.stormfront.services.WeatherPacketService;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import io.papermc.paper.command.brigadier.Commands;
@@ -59,6 +59,7 @@ public final class StormfrontApiPlugin extends JavaPlugin {
                 weatherPacketService.reset(player);
             }
         }
+        StormfrontAPI.clearInstance();
         getLogger().info("Stormfront API disabled. Version: " + getPluginMeta().getVersion());
     }
 

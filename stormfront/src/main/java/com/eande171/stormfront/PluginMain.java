@@ -1,7 +1,6 @@
 package com.eande171.stormfront;
 
 import com.eande171.stormfront.api.StormfrontAPI;
-import com.eande171.stormfront.api.WeatherType;
 import com.eande171.stormfront.weather.BlizzardType;
 import com.eande171.stormfront.weather.HeatwaveType;
 import com.eande171.stormfront.weather.MiasmaType;
@@ -27,16 +26,10 @@ public final class PluginMain extends JavaPlugin {
 
     private void registerWeatherTypes() {
         FileConfiguration config = getConfig();
-        maybeRegister(config, "types.rainfront",    new RainfrontType());
-        maybeRegister(config, "types.thunderstorm", new ThunderstormType());
-        maybeRegister(config, "types.miasma",        new MiasmaType());
-        maybeRegister(config, "types.blizzard",     new BlizzardType());
-        maybeRegister(config, "types.heatwave",     new HeatwaveType());
-    }
-
-    private void maybeRegister(FileConfiguration config, String key, WeatherType type) {
-        if (config.getBoolean(key, true)) {
-            StormfrontAPI.get().getRegistry().register(type);
-        }
+        StormfrontAPI.registerIfEnabled(config, "types.rainfront",    new RainfrontType());
+        StormfrontAPI.registerIfEnabled(config, "types.thunderstorm", new ThunderstormType());
+        StormfrontAPI.registerIfEnabled(config, "types.miasma",       new MiasmaType());
+        StormfrontAPI.registerIfEnabled(config, "types.blizzard",     new BlizzardType());
+        StormfrontAPI.registerIfEnabled(config, "types.heatwave",     new HeatwaveType());
     }
 }

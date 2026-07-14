@@ -4,6 +4,7 @@ import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.events.PlayerEnterWeatherCellEvent;
 import com.eande171.stormfront.api.events.PlayerExitWeatherCellEvent;
 import com.eande171.stormfront.services.PlayerDataService;
+import com.eande171.stormfront.services.WeatherPacketService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -15,9 +16,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class EngineListener implements Listener {
+
+    private static final Logger LOGGER = Logger.getLogger(EngineListener.class.getName());
 
     private final PlayerDataService playerDataService;
     private final WeatherPacketService weatherPacketService;
@@ -43,13 +47,18 @@ public class EngineListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Set<UUID> trackedIds = playerDataService.getCellIds(player.getUniqueId());
-        for (WeatherCell cell : cellManager.getActiveCells()) {
-            if (trackedIds.contains(cell.getId())) {
-                cell.getType().onPlayerExit(player);
+        try {
+            for (WeatherCell cell : cellManager.getActiveCells()) {
+                if (trackedIds.contains(cell.getId())) {
+                    WeatherUtils.safeRun(LOGGER,
+                        "Weather type " + cell.getType().getId() + " threw in onPlayerExit for " + player.getName(),
+                        () -> cell.getType().onPlayerExit(player));
+                }
             }
+        } finally {
+            playerDataService.removePlayer(player.getUniqueId());
+            weatherPacketService.reset(player);
         }
-        playerDataService.removePlayer(player.getUniqueId());
-        weatherPacketService.reset(player);
     }
 
     @EventHandler

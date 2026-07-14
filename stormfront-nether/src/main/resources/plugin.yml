@@ -1,0 +1,11 @@
+name: StormfrontNether
+version: '${version}'
+
+main: com.eande171.stormfront.nether.StormfrontNetherPlugin
+api-version: '1.21'
+load: POSTWORLD
+
+depend: [ StormfrontAPI ]
+
+description: Nether-themed weather addon for Stormfront
+authors: [ Eden Anderson ]

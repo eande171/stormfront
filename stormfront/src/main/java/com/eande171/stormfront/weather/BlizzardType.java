@@ -47,11 +47,9 @@ public class BlizzardType implements WeatherType {
     @Override
     public float getNaturalSpawnWeight() { return 0.25f; }
 
-    // Full precipitation - shows vanilla snow in cold biomes, fades in/out via WeatherPacketService
     @Override
     public float getRainMultiplier() { return 1.0f; }
 
-    // Subtle darkening - blizzard sky is white-grey, not stormy black
     @Override
     public float getThunderMultiplier() { return 0.15f; }
 
@@ -89,7 +87,6 @@ public class BlizzardType implements WeatherType {
 
     @Override
     public void onEntityTick(WeatherCell cell, LivingEntity entity) {
-        // Gradually freeze nearby mobs - increment rather than set so it builds up naturally
         int target = Math.min(entity.getFreezeTicks() + 10, entity.getMaxFreezeTicks());
         entity.setFreezeTicks(target);
     }
@@ -106,7 +103,6 @@ public class BlizzardType implements WeatherType {
             double x = loc.getX() + (RANDOM.nextDouble() - 0.5) * 8;
             double y = loc.getY() + 3 + RANDOM.nextDouble() * 4;
             double z = loc.getZ() + (RANDOM.nextDouble() - 0.5) * 8;
-            // Small horizontal offset simulates wind-driven snow
             player.spawnParticle(Particle.SNOWFLAKE,
                 new Location(world, x, y, z),
                 1, 0.15, 0, 0.15, 0.02);
@@ -114,16 +110,8 @@ public class BlizzardType implements WeatherType {
 
         // Distant snowflakes - sparse, appear fixed in the air as player walks into them
         int distantCount = Math.max(1, (int) (5 * intensity));
-        for (int i = 0; i < distantCount; i++) {
-            double angle = RANDOM.nextDouble() * Math.PI * 2;
-            double dist = 30 + RANDOM.nextDouble() * 20;
-            double x = loc.getX() + dist * Math.cos(angle);
-            double y = loc.getY() + 1 + RANDOM.nextDouble() * 8;
-            double z = loc.getZ() + dist * Math.sin(angle);
-            player.spawnParticle(Particle.SNOWFLAKE,
-                new Location(world, x, y, z),
-                1, 0.1, 0, 0.1, 0.01);
-        }
+        WeatherUtils.spawnScatteredAirField(player, Particle.SNOWFLAKE, distantCount,
+            30, 50, 1, 9, 0.1, 0, 0.1, 0.01);
     }
 
     private void spawnGroundDrift(Player player, float intensity) {
@@ -139,7 +127,6 @@ public class BlizzardType implements WeatherType {
             int z = (int) (loc.getZ() + (RANDOM.nextDouble() - 0.5) * 10);
             Integer surface = WeatherUtils.findGroundY(world, x, loc.getBlockY(), z);
             double groundY = surface != null ? surface + 1.0 : loc.getY();
-            // Higher speed than fog drift - ground snow is blown around by wind
             player.spawnParticle(Particle.CLOUD,
                 new Location(world, x + 0.5, groundY, z + 0.5),
                 1, 0.3, 0.05, 0.3, 0.025);
@@ -196,7 +183,6 @@ public class BlizzardType implements WeatherType {
             streaks.add(new double[]{sx, sy, sz, now});
         }
 
-        // Render each streak as a travelling sine wave of WHITE_ASH
         for (double[] streak : streaks) {
             double age = (now - streak[3]) / 1000.0;
             for (int p = 0; p < POINTS_PER_STREAK; p++) {

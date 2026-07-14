@@ -15,11 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class WeatherGenerator {
 
+    private static final Logger LOGGER = Logger.getLogger(WeatherGenerator.class.getName());
     private static final Random RANDOM = new Random();
 
     private final JavaPlugin plugin;
@@ -45,7 +47,9 @@ public class WeatherGenerator {
         List<WeatherType> eligible = StormfrontAPI.get().getRegistry().getAll().stream()
             .filter(type -> type.getNaturalSpawnWeight() > 0)
             .filter(type -> type.getCompatibleBiomes().isEmpty() || type.getCompatibleBiomes().contains(biome))
-            .filter(type -> type.canNaturallySpawn(target))
+            .filter(type -> WeatherUtils.safeTest(LOGGER,
+                "Weather type " + type.getId() + " threw in canNaturallySpawn", false,
+                () -> type.canNaturallySpawn(target)))
             .collect(Collectors.toList());
 
         if (eligible.isEmpty()) return;

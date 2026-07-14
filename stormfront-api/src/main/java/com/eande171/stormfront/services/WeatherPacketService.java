@@ -1,4 +1,4 @@
-package com.eande171.stormfront;
+package com.eande171.stormfront.services;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
@@ -40,10 +40,11 @@ public class WeatherPacketService {
     }
 
     public void reset(Player player) {
-        rainLevels.remove(player.getUniqueId());
-        thunderLevels.remove(player.getUniqueId());
-        sendEndRaining(player);
-        sendThunderLevel(player, 0f);
+        UUID uuid = player.getUniqueId();
+        Float rain = rainLevels.remove(uuid);
+        Float thunder = thunderLevels.remove(uuid);
+        if (rain != null && rain > 0) sendEndRaining(player);
+        if (thunder != null && thunder > 0) sendThunderLevel(player, 0f);
     }
 
     private float step(float current, float target) {

@@ -29,8 +29,10 @@ public interface WeatherType {
 
     void onEnd(WeatherCell cell);
 
+    // Biome keys this type can appear in; an EMPTY set means compatible with ALL biomes, not none
     Set<String> getCompatibleBiomes();
 
+    // Highest-priority cell overlapping a player is the one ticked; ties are broken arbitrarily, not deterministically
     int getPriority();
 
     // Relative chance this type is selected during natural generation (0.0 = never, 1.0 = full weight)

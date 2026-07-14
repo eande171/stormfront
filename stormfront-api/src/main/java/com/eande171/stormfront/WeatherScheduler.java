@@ -5,6 +5,7 @@ import com.eande171.stormfront.api.events.PlayerEnterWeatherCellEvent;
 import com.eande171.stormfront.api.events.PlayerExitWeatherCellEvent;
 import com.eande171.stormfront.api.events.WeatherCellMoveEvent;
 import com.eande171.stormfront.services.PlayerDataService;
+import com.eande171.stormfront.services.WeatherPacketService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,9 +15,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class WeatherScheduler {
+
+    private static final Logger LOGGER = Logger.getLogger(WeatherScheduler.class.getName());
 
     private final JavaPlugin plugin;
     private final CellManager cellManager;
@@ -77,9 +81,7 @@ public class WeatherScheduler {
                     }
                 }
 
-                // Must update before the finally block - removeCell fires onPlayerExit, which reads
-                // the player's cell set. Updating here ensures expiring cells are already excluded,
-                // so removeCell does not fire a second exit event for them.
+                // Must run before the finally block, or removeCell fires a duplicate exit event for expiring cells
                 playerDataService.setCellIds(playerUUID, current);
 
                 Optional<WeatherCell> priorityCell = current.stream()
@@ -87,13 +89,13 @@ public class WeatherScheduler {
                     .filter(Objects::nonNull)
                     .max(Comparator.comparingInt(c -> c.getType().getPriority()));
 
-                priorityCell.ifPresent(cell -> cell.getType().onTick(cell, player));
+                priorityCell.ifPresent(cell -> WeatherUtils.safeRun(LOGGER,
+                    "Weather type " + cell.getType().getId() + " threw in onTick for " + player.getName(),
+                    () -> cell.getType().onTick(cell, player)));
 
-                // Rain level uses a sqrt curve - sky greys quickly near the edge
-                // Thunder level depth is driven by the type's thunder multiplier
+                // Sqrt curve so the sky greys quickly near the cell's edge
                 float targetRain = priorityCell.map(cell -> {
-                    double distance = player.getLocation().distance(cell.getCenter());
-                    float distanceFactor = Math.max(0f, 1.0f - (float) (distance / cell.getRadius()));
+                    float distanceFactor = WeatherUtils.distanceFactor(cell, player.getLocation());
                     return cell.getIntensity() * (float) Math.sqrt(distanceFactor) * cell.getType().getRainMultiplier();
                 }).orElse(0f);
 
@@ -113,7 +115,8 @@ public class WeatherScheduler {
                 for (Entity entity : center.getWorld().getNearbyEntities(center, r, r, r,
                         e -> e instanceof LivingEntity && !(e instanceof Player))) {
                     if (entity.getLocation().distance(center) <= r) {
-                        cell.getType().onEntityTick(cell, (LivingEntity) entity);
+                        WeatherUtils.safeRun(LOGGER, "Weather type " + cell.getType().getId() + " threw in onEntityTick",
+                            () -> cell.getType().onEntityTick(cell, (LivingEntity) entity));
                     }
                 }
             }
@@ -125,8 +128,7 @@ public class WeatherScheduler {
                 Bukkit.getPluginManager().callEvent(new WeatherCellMoveEvent(cell, previousCenter));
             }
         } finally {
-            // Expire cells - guaranteed to run even if processing throws.
-            // CellManager handles onEnd and WeatherCellEndEvent.
+            // Guaranteed to run even if processing throws; CellManager handles onEnd/WeatherCellEndEvent
             expiring.forEach(cellManager::removeCell);
         }
     }

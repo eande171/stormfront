@@ -8,14 +8,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class WeatherRegistryImpl implements WeatherRegistry {
+
+    private static final Logger LOGGER = Logger.getLogger(WeatherRegistryImpl.class.getName());
 
     private final Map<String, WeatherType> types = new HashMap<>();
 
     @Override
     public void register(WeatherType type) {
-        types.put(type.getId(), type);
+        WeatherType previous = types.put(type.getId(), type);
+        if (previous != null) {
+            LOGGER.warning("WeatherType id \"" + type.getId() + "\" was already registered - overwriting previous registration.");
+        }
     }
 
     @Override

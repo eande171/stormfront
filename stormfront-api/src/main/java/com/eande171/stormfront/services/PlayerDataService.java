@@ -11,7 +11,7 @@ public class PlayerDataService {
     private final Map<UUID, Set<UUID>> activeCells = new HashMap<>();
 
     public Set<UUID> getCellIds(UUID playerUUID) {
-        return activeCells.getOrDefault(playerUUID, Collections.emptySet());
+        return Collections.unmodifiableSet(activeCells.getOrDefault(playerUUID, Collections.emptySet()));
     }
 
     public void setCellIds(UUID playerUUID, Set<UUID> cellIds) {

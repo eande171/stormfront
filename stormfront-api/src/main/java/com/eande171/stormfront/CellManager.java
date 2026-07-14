@@ -16,24 +16,27 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class CellManager {
+
+    private static final Logger LOGGER = Logger.getLogger(CellManager.class.getName());
 
     private final PlayerDataService playerDataService;
     private final Map<UUID, WeatherCell> activeCells = new HashMap<>();
 
     public void addCell(WeatherCell cell) {
         activeCells.put(cell.getId(), cell);
-        cell.getType().onStart(cell);
+        WeatherUtils.safeRun(LOGGER, "Weather type " + cell.getType().getId() + " threw in onStart",
+            () -> cell.getType().onStart(cell));
         Bukkit.getPluginManager().callEvent(new WeatherCellStartEvent(cell));
     }
 
     public void removeCell(UUID id) {
         WeatherCell cell = activeCells.remove(id);
         if (cell == null) return;
-        // Fire exit events for any player currently tracked inside this cell.
-        // The scheduler's diff logic can't do this because by its next tick the cell is gone.
+        // Fire exit events here since the scheduler's diff logic won't catch it once the cell is gone
         for (Player player : Bukkit.getOnlinePlayers()) {
             Set<UUID> tracked = playerDataService.getCellIds(player.getUniqueId());
             if (tracked.contains(id)) {
@@ -43,7 +46,8 @@ public class CellManager {
                 playerDataService.setCellIds(player.getUniqueId(), updated);
             }
         }
-        cell.getType().onEnd(cell);
+        WeatherUtils.safeRun(LOGGER, "Weather type " + cell.getType().getId() + " threw in onEnd",
+            () -> cell.getType().onEnd(cell));
         Bukkit.getPluginManager().callEvent(new WeatherCellEndEvent(cell));
     }
 

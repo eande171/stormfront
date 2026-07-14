@@ -7,13 +7,33 @@ import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.Enderman;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
 import java.util.Random;
+import java.util.Set;
 
 public abstract class AbstractRainType implements WeatherType {
 
     protected static final Random RANDOM = new Random();
+
+    @Override
+    public Set<String> getCompatibleBiomes() { return Collections.emptySet(); }
+
+    @Override
+    public boolean canNaturallySpawn(Player target) {
+        return target.getWorld().getEnvironment() == World.Environment.NORMAL
+            && !WeatherUtils.isDryBiome(target.getLocation());
+    }
+
+    @Override
+    public void onEntityTick(WeatherCell cell, LivingEntity entity) {
+        if (entity instanceof Enderman && !WeatherUtils.isDryBiome(entity.getLocation())) {
+            entity.damage(1.0);
+        }
+    }
 
     protected void spawnRainImpacts(Player player, float intensity) {
         if (WeatherUtils.isDryBiome(player.getLocation())) return;
@@ -40,18 +60,8 @@ public abstract class AbstractRainType implements WeatherType {
 
         // Distant impacts - sparse, large radius, appear stationary as the player approaches
         int distantCount = Math.max(1, (int) (3 * intensity));
-        for (int i = 0; i < distantCount; i++) {
-            double angle = RANDOM.nextDouble() * Math.PI * 2;
-            double dist = 30 + RANDOM.nextDouble() * 20;
-            int x = (int) (feet.getX() + dist * Math.cos(angle));
-            int z = (int) (feet.getZ() + dist * Math.sin(angle));
-            Integer groundY = WeatherUtils.findGroundY(world, x, feet.getBlockY(), z);
-            if (groundY == null) continue;
-            if (world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES) != groundY) continue;
-            player.spawnParticle(Particle.SPLASH,
-                new Location(world, x + 0.5, groundY + 1, z + 0.5),
-                1, 0.2, 0, 0.2, 0);
-        }
+        WeatherUtils.spawnScatteredGroundField(player, Particle.SPLASH, distantCount,
+            30, 50, 1, true, 1, 0.2, 0, 0.2, 0);
     }
 
     @Override

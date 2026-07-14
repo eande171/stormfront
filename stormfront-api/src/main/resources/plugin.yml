@@ -3,6 +3,7 @@ version: '${version}'
 
 main: com.eande171.stormfront.api.StormfrontApiPlugin
 api-version: '1.21'
+load: POSTWORLD
 
 depend: [ packetevents ]
 

@@ -92,6 +92,12 @@ public class MiasmaType implements WeatherType {
         player.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, NAUSEA_DURATION, 0, false, false, false));
     }
 
+    private Location groundNear(World world, double x, int refY, double z, double yOffset) {
+        Integer groundY = WeatherUtils.findGroundY(world, (int) x, refY, (int) z);
+        if (groundY == null) return null;
+        return new Location(world, x, groundY + yOffset, z);
+    }
+
     private void spawnMiasmaParticles(Player player, float intensity) {
         if (intensity <= 0 || !WeatherUtils.isExposed(player.getLocation())) return;
 
@@ -103,11 +109,9 @@ public class MiasmaType implements WeatherType {
         for (int i = 0; i < cloudCount; i++) {
             double x = feet.getX() + (RANDOM.nextDouble() - 0.5) * 16;
             double z = feet.getZ() + (RANDOM.nextDouble() - 0.5) * 16;
-            Integer groundY = WeatherUtils.findGroundY(world, (int) x, feet.getBlockY(), (int) z);
-            if (groundY == null) continue;
-            player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
-                new Location(world, x, groundY + 0.1, z),
-                1, 0.1, 0.05, 0.1, 0.003);
+            Location loc = groundNear(world, x, feet.getBlockY(), z, 0.1);
+            if (loc == null) continue;
+            player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 1, 0.1, 0.05, 0.1, 0.003);
         }
 
         // Green gas peeking through the smoke
@@ -115,11 +119,9 @@ public class MiasmaType implements WeatherType {
         for (int i = 0; i < greenCount; i++) {
             double x = feet.getX() + (RANDOM.nextDouble() - 0.5) * 14;
             double z = feet.getZ() + (RANDOM.nextDouble() - 0.5) * 14;
-            Integer groundY = WeatherUtils.findGroundY(world, (int) x, feet.getBlockY(), (int) z);
-            if (groundY == null) continue;
-            player.spawnParticle(Particle.DUST,
-                new Location(world, x, groundY + 0.1 + RANDOM.nextDouble() * 1.5, z),
-                1, 0.05, 0.1, 0.05, 0, GAS_GREENS[RANDOM.nextInt(GAS_GREENS.length)]);
+            Location loc = groundNear(world, x, feet.getBlockY(), z, 0.1 + RANDOM.nextDouble() * 1.5);
+            if (loc == null) continue;
+            player.spawnParticle(Particle.DUST, loc, 1, 0.05, 0.1, 0.05, 0, GAS_GREENS[RANDOM.nextInt(GAS_GREENS.length)]);
         }
 
         // Bubbles floating and popping in the gas cloud
@@ -127,27 +129,15 @@ public class MiasmaType implements WeatherType {
         for (int i = 0; i < bubbleCount; i++) {
             double x = feet.getX() + (RANDOM.nextDouble() - 0.5) * 12;
             double z = feet.getZ() + (RANDOM.nextDouble() - 0.5) * 12;
-            Integer groundY = WeatherUtils.findGroundY(world, (int) x, feet.getBlockY(), (int) z);
-            if (groundY == null) continue;
-            double bubbleY = groundY + 0.5 + RANDOM.nextDouble() * 4;
-            player.spawnParticle(Particle.BUBBLE_POP,
-                new Location(world, x, bubbleY, z),
-                1, 0.05, 0.05, 0.05, 0.01);
+            Location loc = groundNear(world, x, feet.getBlockY(), z, 0.5 + RANDOM.nextDouble() * 4);
+            if (loc == null) continue;
+            player.spawnParticle(Particle.BUBBLE_POP, loc, 1, 0.05, 0.05, 0.05, 0.01);
         }
 
         // Mid-range plumes - fills the gap and makes the gas visible before you're in it
         int midCount = (int) (6 * intensity);
-        for (int i = 0; i < midCount; i++) {
-            double angle = RANDOM.nextDouble() * Math.PI * 2;
-            double dist = 14 + RANDOM.nextDouble() * 10;
-            double x = feet.getX() + dist * Math.cos(angle);
-            double z = feet.getZ() + dist * Math.sin(angle);
-            Integer groundY = WeatherUtils.findGroundY(world, (int) x, feet.getBlockY(), (int) z);
-            if (groundY == null) continue;
-            player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
-                new Location(world, x, groundY + 0.5, z),
-                1, 0.1, 0.05, 0.1, 0.003);
-        }
+        WeatherUtils.spawnScatteredGroundField(player, Particle.CAMPFIRE_COSY_SMOKE, midCount,
+            14, 24, 0.5, false, 1, 0.1, 0.05, 0.1, 0.003);
 
         // Spore blossom drift - wide radius, spawned above head height so they fall through the gas
         int sporeCount = (int) (7 * intensity);
@@ -164,16 +154,7 @@ public class MiasmaType implements WeatherType {
 
         // Distant mist - sparse, 35-50 blocks out, appears stationary as player approaches
         int distantCount = Math.max(2, (int) (5 * intensity));
-        for (int i = 0; i < distantCount; i++) {
-            double angle = RANDOM.nextDouble() * Math.PI * 2;
-            double dist = 35 + RANDOM.nextDouble() * 15;
-            double x = feet.getX() + dist * Math.cos(angle);
-            double z = feet.getZ() + dist * Math.sin(angle);
-            Integer groundY = WeatherUtils.findGroundY(world, (int) x, feet.getBlockY(), (int) z);
-            if (groundY == null) continue;
-            player.spawnParticle(Particle.WHITE_ASH,
-                new Location(world, x, groundY + 1.0, z),
-                1, 0.2, 0.3, 0.2, 0.005);
-        }
+        WeatherUtils.spawnScatteredGroundField(player, Particle.WHITE_ASH, distantCount,
+            35, 50, 1.0, false, 1, 0.2, 0.3, 0.2, 0.005);
     }
 }

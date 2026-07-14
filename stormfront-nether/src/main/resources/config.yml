@@ -1,0 +1,3 @@
+# Enable or disable individual Nether weather types
+types:
+  soulstorm: true

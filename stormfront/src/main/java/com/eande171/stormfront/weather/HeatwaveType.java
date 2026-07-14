@@ -40,7 +40,6 @@ public class HeatwaveType implements WeatherType {
     @Override
     public float getNaturalSpawnWeight() { return 0.25f; }
 
-    // Clear oppressive sky - no rain or thunder visuals
     @Override
     public float getRainMultiplier() { return 0f; }
 
@@ -102,16 +101,8 @@ public class HeatwaveType implements WeatherType {
 
         // Far haze - distant shimmer, 35-50 blocks out, appears stationary as player approaches
         int farCount = (int) (10 * intensity);
-        for (int i = 0; i < farCount; i++) {
-            double angle = RANDOM.nextDouble() * Math.PI * 2;
-            double dist = 35 + RANDOM.nextDouble() * 15;
-            double x = loc.getX() + dist * Math.cos(angle);
-            double y = loc.getY() + (RANDOM.nextDouble() - 0.2) * 4;
-            double z = loc.getZ() + dist * Math.sin(angle);
-            player.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
-                new Location(world, x, y, z),
-                1, 0.4, 0.2, 0.4, 0.004);
-        }
+        WeatherUtils.spawnScatteredAirField(player, Particle.CAMPFIRE_COSY_SMOKE, farCount,
+            35, 50, -0.8, 3.2, 0.4, 0.2, 0.4, 0.004);
     }
 
     private void applyHungerDrain(Player player, float intensity) {

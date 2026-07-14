@@ -51,6 +51,34 @@ public class ConfigService {
         naturalGenMovementSpeedMin      = plugin.getConfig().getDouble("natural-generation.movement-speed-min");
         naturalGenMovementSpeedMax      = plugin.getConfig().getDouble("natural-generation.movement-speed-max");
 
+        naturalGenSpawnDistanceMax = clampMax("spawn-distance", naturalGenSpawnDistanceMin, naturalGenSpawnDistanceMax);
+        naturalGenRadiusMax = clampMax("radius", naturalGenRadiusMin, naturalGenRadiusMax);
+        naturalGenIntensityMax = clampMax("intensity", naturalGenIntensityMin, naturalGenIntensityMax);
+        naturalGenDurationMaxSeconds = clampMax("duration", naturalGenDurationMinSeconds, naturalGenDurationMaxSeconds);
+        naturalGenMovementSpeedMax = clampMax("movement-speed", naturalGenMovementSpeedMin, naturalGenMovementSpeedMax);
+
         plugin.getLogger().info("Config loaded.");
+    }
+
+    // Guards against a misconfigured config.yml (max < min)
+    private double clampMax(String key, double min, double max) {
+        if (max >= min) return max;
+        plugin.getLogger().warning("config.yml: natural-generation." + key + "-max (" + max
+            + ") is less than -min (" + min + "); using " + min + " for both.");
+        return min;
+    }
+
+    private int clampMax(String key, int min, int max) {
+        if (max >= min) return max;
+        plugin.getLogger().warning("config.yml: natural-generation." + key + "-max (" + max
+            + ") is less than -min (" + min + "); using " + min + " for both.");
+        return min;
+    }
+
+    private float clampMax(String key, float min, float max) {
+        if (max >= min) return max;
+        plugin.getLogger().warning("config.yml: natural-generation." + key + "-max (" + max
+            + ") is less than -min (" + min + "); using " + min + " for both.");
+        return min;
     }
 }
