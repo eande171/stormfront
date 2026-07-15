@@ -1,6 +1,6 @@
-package com.eande171.stormfront.weather;
+package com.eande171.stormfront.core.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

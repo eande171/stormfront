@@ -1,9 +1,10 @@
-package com.eande171.stormfront.weather;
+package com.eande171.stormfront.core.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -21,21 +22,21 @@ public class BlizzardType implements WeatherType {
 
     private static final Random RANDOM = new Random();
 
-    private static final Set<String> COLD_BIOMES = Set.of(
-        "minecraft:snowy_plains",
-        "minecraft:snowy_taiga",
-        "minecraft:ice_spikes",
-        "minecraft:frozen_ocean",
-        "minecraft:deep_frozen_ocean",
-        "minecraft:frozen_river",
-        "minecraft:snowy_beach",
-        "minecraft:jagged_peaks",
-        "minecraft:frozen_peaks",
-        "minecraft:snowy_slopes",
-        "minecraft:grove",
-        "minecraft:cold_ocean",
-        "minecraft:deep_cold_ocean",
-        "minecraft:windswept_gravelly_hills"
+    private static final Set<NamespacedKey> COLD_BIOMES = Set.of(
+        NamespacedKey.minecraft("snowy_plains"),
+        NamespacedKey.minecraft("snowy_taiga"),
+        NamespacedKey.minecraft("ice_spikes"),
+        NamespacedKey.minecraft("frozen_ocean"),
+        NamespacedKey.minecraft("deep_frozen_ocean"),
+        NamespacedKey.minecraft("frozen_river"),
+        NamespacedKey.minecraft("snowy_beach"),
+        NamespacedKey.minecraft("jagged_peaks"),
+        NamespacedKey.minecraft("frozen_peaks"),
+        NamespacedKey.minecraft("snowy_slopes"),
+        NamespacedKey.minecraft("grove"),
+        NamespacedKey.minecraft("cold_ocean"),
+        NamespacedKey.minecraft("deep_cold_ocean"),
+        NamespacedKey.minecraft("windswept_gravelly_hills")
     );
 
     @Override
@@ -54,7 +55,7 @@ public class BlizzardType implements WeatherType {
     public float getThunderMultiplier() { return 0.15f; }
 
     @Override
-    public Set<String> getCompatibleBiomes() { return COLD_BIOMES; }
+    public Set<NamespacedKey> getCompatibleBiomes() { return COLD_BIOMES; }
 
     @Override
     public void onStart(WeatherCell cell) {}

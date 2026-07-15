@@ -1,15 +1,15 @@
 package com.eande171.stormfront.api;
 
-import com.eande171.stormfront.CellManager;
-import com.eande171.stormfront.EngineListener;
-import com.eande171.stormfront.StormfrontCommand;
-import com.eande171.stormfront.WeatherGenerator;
-import com.eande171.stormfront.WeatherScheduler;
-import com.eande171.stormfront.constants.Permissions;
-import com.eande171.stormfront.registry.StormfrontImpl;
-import com.eande171.stormfront.services.ConfigService;
-import com.eande171.stormfront.services.PlayerDataService;
-import com.eande171.stormfront.services.WeatherPacketService;
+import com.eande171.stormfront.api.constants.Permissions;
+import com.eande171.stormfront.api.engine.CellManagerImpl;
+import com.eande171.stormfront.api.engine.EngineListener;
+import com.eande171.stormfront.api.engine.StormfrontCommand;
+import com.eande171.stormfront.api.engine.WeatherGenerator;
+import com.eande171.stormfront.api.engine.WeatherScheduler;
+import com.eande171.stormfront.api.registry.StormfrontImpl;
+import com.eande171.stormfront.api.services.ConfigService;
+import com.eande171.stormfront.api.services.PlayerDataService;
+import com.eande171.stormfront.api.services.WeatherPacketService;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import io.papermc.paper.command.brigadier.Commands;
@@ -29,7 +29,7 @@ public final class StormfrontApiPlugin extends JavaPlugin {
         configService.load();
 
         PlayerDataService playerDataService = new PlayerDataService();
-        CellManager cellManager = new CellManager(playerDataService);
+        CellManager cellManager = new CellManagerImpl(playerDataService);
 
         StormfrontAPI.setInstance(new StormfrontImpl(cellManager));
 

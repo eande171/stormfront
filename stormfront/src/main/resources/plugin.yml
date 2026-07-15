@@ -1,7 +1,7 @@
 name: Stormfront
 version: '${version}'
 
-main: com.eande171.stormfront.PluginMain
+main: com.eande171.stormfront.core.PluginMain
 api-version: '1.21'
 load: POSTWORLD
 

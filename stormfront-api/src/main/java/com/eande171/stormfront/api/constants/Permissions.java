@@ -1,4 +1,4 @@
-package com.eande171.stormfront.constants;
+package com.eande171.stormfront.api.constants;
 
 public final class Permissions {
     private Permissions() {}

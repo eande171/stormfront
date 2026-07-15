@@ -1,11 +1,11 @@
-package com.eande171.stormfront;
+package com.eande171.stormfront.core;
 
 import com.eande171.stormfront.api.StormfrontAPI;
-import com.eande171.stormfront.weather.BlizzardType;
-import com.eande171.stormfront.weather.HeatwaveType;
-import com.eande171.stormfront.weather.MiasmaType;
-import com.eande171.stormfront.weather.RainfrontType;
-import com.eande171.stormfront.weather.ThunderstormType;
+import com.eande171.stormfront.core.weather.BlizzardType;
+import com.eande171.stormfront.core.weather.HeatwaveType;
+import com.eande171.stormfront.core.weather.MiasmaType;
+import com.eande171.stormfront.core.weather.RainfrontType;
+import com.eande171.stormfront.core.weather.ThunderstormType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 

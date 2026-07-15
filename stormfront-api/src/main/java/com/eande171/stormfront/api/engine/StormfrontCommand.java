@@ -1,5 +1,6 @@
-package com.eande171.stormfront;
+package com.eande171.stormfront.api.engine;
 
+import com.eande171.stormfront.api.CellManager;
 import com.eande171.stormfront.api.StormfrontAPI;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
@@ -108,10 +109,8 @@ public class StormfrontCommand {
     }
 
     private <T> T getOrDefault(CommandContext<CommandSourceStack> ctx, String name, Class<T> type, T defaultValue) {
-        try {
-            return ctx.getArgument(name, type);
-        } catch (IllegalArgumentException e) {
-            return defaultValue;
-        }
+        // Presence check by name so a genuine typo/type mismatch throws instead of returning the default
+        boolean present = ctx.getNodes().stream().anyMatch(node -> node.getNode().getName().equals(name));
+        return present ? ctx.getArgument(name, type) : defaultValue;
     }
 }

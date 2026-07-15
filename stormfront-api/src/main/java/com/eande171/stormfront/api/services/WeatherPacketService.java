@@ -1,4 +1,4 @@
-package com.eande171.stormfront.services;
+package com.eande171.stormfront.api.services;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;

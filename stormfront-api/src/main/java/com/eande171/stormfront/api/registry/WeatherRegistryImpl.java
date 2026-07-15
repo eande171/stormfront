@@ -1,4 +1,4 @@
-package com.eande171.stormfront.registry;
+package com.eande171.stormfront.api.registry;
 
 import com.eande171.stormfront.api.WeatherRegistry;
 import com.eande171.stormfront.api.WeatherType;

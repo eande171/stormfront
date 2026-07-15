@@ -1,10 +1,11 @@
-package com.eande171.stormfront.weather;
+package com.eande171.stormfront.core.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -44,8 +45,8 @@ public class MiasmaType implements WeatherType {
     public float getThunderMultiplier() { return 0.35f; }
 
     @Override
-    public Set<String> getCompatibleBiomes() {
-        return Set.of("minecraft:swamp", "minecraft:mangrove_swamp");
+    public Set<NamespacedKey> getCompatibleBiomes() {
+        return Set.of(NamespacedKey.minecraft("swamp"), NamespacedKey.minecraft("mangrove_swamp"));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.eande171.stormfront;
+package com.eande171.stormfront.api.engine;
 
 import com.eande171.stormfront.api.WeatherCell;
 import org.bukkit.HeightMap;
@@ -90,8 +90,7 @@ public final class WeatherUtils {
         return null;
     }
 
-    // Scatters particles at random angle/distance around the player, snapped to the ground below each point.
-    // requireOpenSky additionally skips positions covered overhead (e.g. rain that shouldn't fall indoors).
+    // Scatters particles around the player, snapped to the ground; requireOpenSky skips spots covered overhead
     public static void spawnScatteredGroundField(Player player, Particle particle, int count,
                                                    double minDist, double maxDist, double heightOffset,
                                                    boolean requireOpenSky,
@@ -115,8 +114,7 @@ public final class WeatherUtils {
         }
     }
 
-    // Scatters particles at random angle/distance around the player, floating at a height relative to the
-    // player rather than snapped to the ground - e.g. distant snowflakes or heat haze drifting in open air.
+    // Scatters particles around the player at a relative height, floating rather than snapped to the ground
     public static void spawnScatteredAirField(Player player, Particle particle, int count,
                                                 double minDist, double maxDist,
                                                 double minHeightOffset, double maxHeightOffset,

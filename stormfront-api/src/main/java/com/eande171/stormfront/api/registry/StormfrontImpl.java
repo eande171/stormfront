@@ -1,6 +1,6 @@
-package com.eande171.stormfront.registry;
+package com.eande171.stormfront.api.registry;
 
-import com.eande171.stormfront.CellManager;
+import com.eande171.stormfront.api.CellManager;
 import com.eande171.stormfront.api.StormfrontAPI;
 import com.eande171.stormfront.api.WeatherRegistry;
 import lombok.Getter;

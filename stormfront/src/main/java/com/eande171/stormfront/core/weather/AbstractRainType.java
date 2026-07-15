@@ -1,10 +1,11 @@
-package com.eande171.stormfront.weather;
+package com.eande171.stormfront.core.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Enderman;
@@ -20,7 +21,7 @@ public abstract class AbstractRainType implements WeatherType {
     protected static final Random RANDOM = new Random();
 
     @Override
-    public Set<String> getCompatibleBiomes() { return Collections.emptySet(); }
+    public Set<NamespacedKey> getCompatibleBiomes() { return Collections.emptySet(); }
 
     @Override
     public boolean canNaturallySpawn(Player target) {

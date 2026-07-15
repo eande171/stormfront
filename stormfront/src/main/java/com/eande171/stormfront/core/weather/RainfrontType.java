@@ -1,6 +1,6 @@
-package com.eande171.stormfront.weather;
+package com.eande171.stormfront.core.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import org.bukkit.entity.Player;
 
@@ -11,6 +11,10 @@ public class RainfrontType extends AbstractRainType {
 
     @Override
     public int getPriority() { return 1; }
+
+    // Plain rain, no lightning - no thunder darkening
+    @Override
+    public float getThunderMultiplier() { return 0f; }
 
     @Override
     public void onStart(WeatherCell cell) {}

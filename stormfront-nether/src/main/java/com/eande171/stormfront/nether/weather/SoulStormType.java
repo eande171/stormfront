@@ -1,9 +1,10 @@
 package com.eande171.stormfront.nether.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -40,8 +41,8 @@ public class SoulStormType implements WeatherType {
     public float getThunderMultiplier() { return 0f; }
 
     @Override
-    public Set<String> getCompatibleBiomes() {
-        return Set.of("minecraft:soul_sand_valley");
+    public Set<NamespacedKey> getCompatibleBiomes() {
+        return Set.of(NamespacedKey.minecraft("soul_sand_valley"));
     }
 
     @Override

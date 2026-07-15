@@ -1,4 +1,4 @@
-package com.eande171.stormfront.services;
+package com.eande171.stormfront.api.services;
 
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;

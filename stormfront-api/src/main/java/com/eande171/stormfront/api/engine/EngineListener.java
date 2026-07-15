@@ -1,10 +1,11 @@
-package com.eande171.stormfront;
+package com.eande171.stormfront.api.engine;
 
+import com.eande171.stormfront.api.CellManager;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.events.PlayerEnterWeatherCellEvent;
 import com.eande171.stormfront.api.events.PlayerExitWeatherCellEvent;
-import com.eande171.stormfront.services.PlayerDataService;
-import com.eande171.stormfront.services.WeatherPacketService;
+import com.eande171.stormfront.api.services.PlayerDataService;
+import com.eande171.stormfront.api.services.WeatherPacketService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -67,6 +68,7 @@ public class EngineListener implements Listener {
         // Covered entities are not in sunlight - no need to intervene
         if (!WeatherUtils.isExposed(entity.getLocation())) return;
         for (WeatherCell cell : cellManager.getActiveCells()) {
+            if (cell.getType().getRainMultiplier() <= 0) continue;
             if (!entity.getWorld().equals(cell.getCenter().getWorld())) continue;
             if (entity.getLocation().distance(cell.getCenter()) <= cell.getRadius()) {
                 event.setCancelled(true);

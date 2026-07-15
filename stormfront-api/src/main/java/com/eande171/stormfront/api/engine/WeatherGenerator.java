@@ -1,12 +1,14 @@
-package com.eande171.stormfront;
+package com.eande171.stormfront.api.engine;
 
+import com.eande171.stormfront.api.CellManager;
 import com.eande171.stormfront.api.StormfrontAPI;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
-import com.eande171.stormfront.services.ConfigService;
+import com.eande171.stormfront.api.services.ConfigService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -42,7 +44,7 @@ public class WeatherGenerator {
         if (players.isEmpty()) return;
 
         Player target = players.get(RANDOM.nextInt(players.size()));
-        String biome = target.getLocation().getBlock().getBiome().getKey().toString();
+        NamespacedKey biome = target.getLocation().getBlock().getBiome().getKey();
 
         List<WeatherType> eligible = StormfrontAPI.get().getRegistry().getAll().stream()
             .filter(type -> type.getNaturalSpawnWeight() > 0)

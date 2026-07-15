@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.eande171</groupId>
             <artifactId>stormfront-api</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

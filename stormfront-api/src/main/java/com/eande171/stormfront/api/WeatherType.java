@@ -1,5 +1,6 @@
 package com.eande171.stormfront.api;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -23,14 +24,14 @@ public interface WeatherType {
     default float getRainMultiplier() { return 1.0f; }
 
     // Multiplier applied to the sky thunder level packet (0 = no effect, 1 = full storm sky)
-    default float getThunderMultiplier() { return 0.25f; }
+    default float getThunderMultiplier() { return 0f; }
 
     void onStart(WeatherCell cell);
 
     void onEnd(WeatherCell cell);
 
     // Biome keys this type can appear in; an EMPTY set means compatible with ALL biomes, not none
-    Set<String> getCompatibleBiomes();
+    Set<NamespacedKey> getCompatibleBiomes();
 
     // Highest-priority cell overlapping a player is the one ticked; ties are broken arbitrarily, not deterministically
     int getPriority();

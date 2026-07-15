@@ -1,4 +1,4 @@
-package com.eande171.stormfront.services;
+package com.eande171.stormfront.api.services;
 
 import java.util.Collections;
 import java.util.HashMap;

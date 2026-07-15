@@ -27,10 +27,9 @@ public abstract class StormfrontAPI {
 
     public abstract WeatherRegistry getRegistry();
 
-    public abstract com.eande171.stormfront.CellManager getCellManager();
+    public abstract CellManager getCellManager();
 
-    // Registers a built-in weather type only if its config.yml flag is true (default true) - shared by
-    // core and addon plugins so each doesn't need to reimplement the same config-gated registration
+    // Registers a type only if its config.yml flag is true (default true); shared by core and addon plugins
     public static void registerIfEnabled(FileConfiguration config, String key, WeatherType type) {
         if (config.getBoolean(key, true)) {
             get().getRegistry().register(type);

@@ -1,9 +1,10 @@
-package com.eande171.stormfront.weather;
+package com.eande171.stormfront.core.weather;
 
-import com.eande171.stormfront.WeatherUtils;
+import com.eande171.stormfront.api.engine.WeatherUtils;
 import com.eande171.stormfront.api.WeatherCell;
 import com.eande171.stormfront.api.WeatherType;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -17,18 +18,18 @@ public class HeatwaveType implements WeatherType {
     // ~1 hunger point every 20 seconds at full intensity (scheduler default: 4 ticks)
     private static final float HUNGER_DRAIN_CHANCE = 0.01f;
 
-    private static final Set<String> HOT_BIOMES = Set.of(
-        "minecraft:desert",
-        "minecraft:savanna",
-        "minecraft:savanna_plateau",
-        "minecraft:windswept_savanna",
-        "minecraft:badlands",
-        "minecraft:wooded_badlands",
-        "minecraft:eroded_badlands",
-        "minecraft:warm_ocean",
-        "minecraft:jungle",
-        "minecraft:sparse_jungle",
-        "minecraft:bamboo_jungle"
+    private static final Set<NamespacedKey> HOT_BIOMES = Set.of(
+        NamespacedKey.minecraft("desert"),
+        NamespacedKey.minecraft("savanna"),
+        NamespacedKey.minecraft("savanna_plateau"),
+        NamespacedKey.minecraft("windswept_savanna"),
+        NamespacedKey.minecraft("badlands"),
+        NamespacedKey.minecraft("wooded_badlands"),
+        NamespacedKey.minecraft("eroded_badlands"),
+        NamespacedKey.minecraft("warm_ocean"),
+        NamespacedKey.minecraft("jungle"),
+        NamespacedKey.minecraft("sparse_jungle"),
+        NamespacedKey.minecraft("bamboo_jungle")
     );
 
     @Override
@@ -47,7 +48,7 @@ public class HeatwaveType implements WeatherType {
     public float getThunderMultiplier() { return 0f; }
 
     @Override
-    public Set<String> getCompatibleBiomes() { return HOT_BIOMES; }
+    public Set<NamespacedKey> getCompatibleBiomes() { return HOT_BIOMES; }
 
     @Override
     public void onStart(WeatherCell cell) {}
